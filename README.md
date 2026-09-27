@@ -6,7 +6,7 @@ A speaker pastes their talk outline, clicks **Present**, and then **Start listen
 Open **https://live-outline.vercel.app** in Safari, then tap Share → **Add to Home Screen**. Tap **Listen** to follow your voice, and swipe or use ‹ › to move by hand. If listening isn't allowed from the home-screen icon, open the same link in Safari.
 
 ## Smart following (Claude)
-Speakers rarely read their outline word for word. With smart following on (⚙︎ on iPhone, ⌘, on Mac):
+Speakers rarely read their outline word for word. Smart following is in the **Mac app** for now (⌘, → Settings); the iPhone version doesn't use it yet. With it on:
 - When you start presenting, Claude writes related hint words for each line (`api/expand`).
 - While you talk, the app matches on the device first. When it's unsure for a few seconds, or every ~10 seconds, it sends the last ~25 seconds of speech to Claude (`api/locate`), which says which point you're on and which of your words showed it.
 - Those words are saved per outline line, and fixing the highlight by hand teaches it too. Next time the app recognises them on its own, so it gets quicker and needs Claude less.

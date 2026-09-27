@@ -1,5 +1,5 @@
 // Caches the app so it opens instantly and works offline. Bump VERSION when files change.
-const VERSION = 'live-outline-v5';
+const VERSION = 'live-outline-v6';
 const FILES = ['./', 'index.html', 'styles.css', 'app.js', 'matcher.js', 'manifest.webmanifest',
   'icons/icon-180.png'];
 

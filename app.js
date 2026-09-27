@@ -1,5 +1,5 @@
 (() => {
-  const { parseOutline, Matcher, WordFeeder, LearnedLibrary, shouldLocate } = window.OutlineMatcher;
+  const { parseOutline, Matcher, WordFeeder } = window.OutlineMatcher;
   const $ = id => document.getElementById(id);
   const SAMPLE = `Welcome and introductions
 Why sleep matters
@@ -22,17 +22,6 @@ Questions`;
   let transcript = '';
   let wakeLock = null;
   const feeder = new WordFeeder(3);
-
-  // ---------- Smart following (Claude) ----------
-  let localStore = null;
-  try { localStore = window.localStorage; } catch (e) {}
-  const library = new LearnedLibrary(localStore);
-  const RECENT_MS = 25000;        // how much recent speech Claude sees
-  const ai = { enabled: store.get('aiEnabled') !== '0', disabledReason: '', inFlight: null,
-    lastCallAt: 0, lastConfidentAt: 0, newWords: 0, lastTeachAt: 0 };
-  let chunks = [];                // [{ t, text }] recent transcript pieces
-  let aiTimer = null;
-  let teachTimer = null;
 
   $('outlineInput').value = store.get('outline') || SAMPLE;
 
@@ -92,15 +81,10 @@ Questions`;
     $('progressText').textContent = n ? `${matcher.current + 1} of ${n}` : 'Your outline is empty';
   }
 
-  // Moves the highlight by hand; Claude learns from the correction.
   function select(i) {
     if (!matcher || !matcher.items.length) return;
-    const target = Math.max(0, Math.min(i, matcher.items.length - 1));
-    if (target === matcher.current) return;
-    matcher.setCurrent(target);
+    matcher.setCurrent(Math.max(0, Math.min(i, matcher.items.length - 1)));
     highlight();
-    ai.lastConfidentAt = Date.now();
-    teachSoon();
   }
 
   function setMode(present) {
@@ -112,11 +96,7 @@ Questions`;
     if (present) {
       $('outlineInput').blur();
       matcher = new Matcher(parseOutline($('outlineInput').value));
-      chunks = [];
-      Object.assign(ai, { lastCallAt: Date.now(), lastConfidentAt: Date.now(), newWords: 0 });
-      if (ai.inFlight) ai.inFlight.abort();
       renderOutline();
-      loadLibrary();
       window.scrollTo({ top: 0 });
       keepAwake(true);
     } else {
@@ -131,132 +111,10 @@ Questions`;
     if (!matcher || !text) return;
     transcript = (transcript + ' ' + text).trim().slice(-300);
     showTicker(transcript);
-    const now = Date.now();
-    chunks.push({ t: now, text });
-    chunks = chunks.filter(c => now - c.t < 60000);
-    ai.newWords += text.split(/\s+/).length;
     const before = matcher.current;
     matcher.feed(text);
     if (matcher.current !== before) highlight();
-    if (matcher.current !== before || matcher.hits(matcher.current, text) > 0) ai.lastConfidentAt = now;
-    maybeLocate();
   };
-
-  function recentTranscript(ms = RECENT_MS) {
-    const now = Date.now();
-    return chunks.filter(c => now - c.t < ms).map(c => c.text).join(' ');
-  }
-
-  async function api(path, body, signal) {
-    const res = await fetch(path, {
-      method: 'POST', signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...body, code: store.get('accessCode') || '' }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      const err = new Error(data.error || `Request failed (${res.status})`);
-      err.status = res.status;
-      throw err;
-    }
-    return data;
-  }
-
-  // Stop calling Claude for this session after a setup problem, and say why once.
-  function aiFailed(err) {
-    if (err.name === 'AbortError') return;
-    if (err.status === 401 || err.status === 400 || err.status === 404 || err.status === 500) {
-      ai.disabledReason = err.status === 404 ? 'Smart following isn\'t available on this copy of the app.' : err.message;
-      showNotice('Smart following is off: ' + ai.disabledReason + ' You can change this in ⚙︎ Settings.');
-    }
-  }
-  const aiOn = () => ai.enabled && !ai.disabledReason && navigator.onLine !== false;
-
-  // Put saved hint and learned words onto the outline, then fetch hints for any new lines.
-  async function loadLibrary() {
-    const items = matcher.items;
-    items.forEach((it, i) => {
-      const w = library.words(it.text);
-      matcher.addKeywords(i, w.hints, 'hint');
-      matcher.addKeywords(i, w.learned, 'learned');
-    });
-    updateBrain();
-    if (!aiOn() || items.every(it => library.has(it.text))) return;
-    const m = matcher;
-    try {
-      const { hints } = await api('/api/expand', { items: items.map(it => it.text) });
-      hints.forEach((words, i) => {
-        if (!words.length || library.has(items[i].text)) return;
-        library.setHints(items[i].text, words);
-        m.addKeywords(i, words, 'hint');
-      });
-      library.save();
-    } catch (err) { aiFailed(err); }
-  }
-
-  function learn(index, words) {
-    if (!words || !words.length || !matcher.items[index]) return;
-    matcher.addKeywords(index, words, 'learned');
-    if (library.addLearned(matcher.items[index].text, words)) {
-      library.save();
-      updateBrain(true);
-    }
-  }
-
-  function updateBrain(pulse) {
-    const n = library.learnedCount();
-    const el = $('brain');
-    el.hidden = n === 0;
-    el.textContent = `🧠 ${n} learned`;
-    if (pulse) { el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
-  }
-
-  async function maybeLocate() {
-    if (!matcher || !aiOn() || $('present').hidden) return;
-    const now = Date.now();
-    if (!shouldLocate({ now, lastCallAt: ai.lastCallAt, lastConfidentAt: ai.lastConfidentAt,
-      newWords: ai.newWords, inFlight: !!ai.inFlight })) return;
-    const transcript = recentTranscript();
-    if (!transcript) return;
-    ai.lastCallAt = now;
-    ai.newWords = 0;
-    const m = matcher, asked = matcher.current;
-    const ctrl = new AbortController();
-    ai.inFlight = ctrl;
-    try {
-      const r = await api('/api/locate', { items: m.items.map(it => it.text), current: asked, transcript }, ctrl.signal);
-      if (m !== matcher) return; // outline changed while waiting
-      // Don't override a correction the user made while Claude was thinking.
-      if (r.confidence === 'high' && r.index !== m.current && m.current === asked) {
-        m.setCurrent(r.index);
-        highlight();
-      }
-      if (r.confidence === 'high' || (r.confidence === 'medium' && r.index === m.current)) {
-        learn(r.index, r.learned);
-        ai.lastConfidentAt = Date.now();
-      }
-    } catch (err) { aiFailed(err); }
-    finally { if (ai.inFlight === ctrl) ai.inFlight = null; }
-  }
-
-  // When the user corrects the highlight, teach the words they just said for that point.
-  // Waits for taps to settle so several quick taps teach only the final point.
-  function teachSoon() {
-    clearTimeout(teachTimer);
-    teachTimer = setTimeout(() => teach(matcher.current), 1500);
-  }
-
-  async function teach(index) {
-    if (!aiOn() || Date.now() - ai.lastTeachAt < 4000) return;
-    const transcript = recentTranscript(15000);
-    if (transcript.split(/\s+/).length < 6) return;
-    ai.lastTeachAt = Date.now();
-    const m = matcher;
-    try {
-      const r = await api('/api/locate', { items: m.items.map(it => it.text), current: index, known: index, transcript });
-      if (m === matcher) learn(index, r.learned);
-    } catch (err) { aiFailed(err); }
-  }
 
   function showTicker(text) {
     const bdi = document.createElement('bdi');
@@ -323,11 +181,9 @@ Questions`;
     }
     listening = !listening;
     clearTimeout(restartTimer);
-    clearInterval(aiTimer);
     if (listening) {
       feeder.reset();
       try { recognition.start(); } catch (e) {}
-      aiTimer = setInterval(maybeLocate, 2000); // "unsure for a while" can happen between words
     } else {
       recognition.stop();
     }
@@ -380,22 +236,6 @@ Questions`;
   $('prevBtn').onclick = () => select(matcher.current - 1);
   $('nextBtn').onclick = () => select(matcher.current + 1);
   window.addEventListener('resize', () => { if (matcher && !$('present').hidden) highlight(false); });
-
-  // ---------- Settings ----------
-  function renderSettings() {
-    $('aiToggle').checked = ai.enabled;
-    $('codeInput').value = store.get('accessCode') || '';
-    const n = library.learnedCount();
-    $('libStats').textContent = n ? `Learned so far: ${n} words across your outlines.` : 'Nothing learned yet.';
-  }
-  $('settingsBtn').onclick = () => { renderSettings(); $('settings').showModal(); };
-  $('aiToggle').onchange = () => { ai.enabled = $('aiToggle').checked; store.set('aiEnabled', ai.enabled ? '1' : '0'); ai.disabledReason = ''; };
-  $('codeInput').onchange = () => { store.set('accessCode', $('codeInput').value.trim()); ai.disabledReason = ''; $('notice').hidden = true; };
-  $('resetLib').onclick = () => { library.reset(); renderSettings(); if (matcher) updateBrain(); };
-  $('settings').addEventListener('close', () => {
-    store.set('accessCode', $('codeInput').value.trim());
-    if (matcher && !$('present').hidden && aiOn()) loadLibrary();
-  });
 
   renderPreview();
   showTicker('');

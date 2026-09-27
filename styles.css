@@ -101,22 +101,4 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: 
 .mic.live .mic-icon { border-radius: 3px; width: 16px; height: 16px; background: #fff; }
 .mic.live .mic-icon::after { display: none; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 #ff3b3066; } 70% { box-shadow: 0 0 0 14px #ff3b3000; } 100% { box-shadow: 0 0 0 0 #ff3b3000; } }
-
-/* Settings and learning */
-.topbar-right { display: flex; align-items: center; gap: 8px; }
-.icon-btn { width: 36px; height: 36px; border-radius: 50%; font-size: 18px; color: var(--muted); }
-.brain { margin-left: 8px; padding: 1px 8px; border-radius: 99px; background: var(--hl); color: var(--accent); font-weight: 600; }
-.brain.pulse { animation: brainpulse .8s ease; }
-@keyframes brainpulse { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
-dialog { border: 0; border-radius: 20px; padding: 0; width: min(420px, calc(100vw - 32px)); background: var(--bg); color: var(--fg); box-shadow: 0 20px 60px #00000055; }
-dialog::backdrop { background: #0006; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
-dialog form { padding: 20px; }
-dialog h3 { margin: 0 0 6px; font-size: 20px; }
-dialog input[type=password] { width: 100%; font: inherit; font-size: 16px; padding: 12px; border-radius: 12px; border: 0.5px solid var(--line); background: var(--card); color: var(--fg); margin-bottom: 10px; }
-.muted { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
-.row { display: flex; align-items: center; gap: 10px; font-size: 17px; color: var(--fg); margin-bottom: 14px; }
-.row input { width: 22px; height: 22px; accent-color: var(--accent); }
-.dialog-actions { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
-.danger { color: #ff3b30; font-size: 15px; min-height: 44px; }
-.pill { min-height: 44px; padding: 0 22px; border-radius: 22px; }
-@media (prefers-reduced-motion: reduce) { .highlight, #progressFill { transition: none; } .mic.live, .brain.pulse { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .highlight, #progressFill { transition: none; } .mic.live { animation: none; } }

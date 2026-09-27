@@ -19,12 +19,9 @@
 <body>
 <header class="topbar">
   <h1>Live Outline</h1>
-  <div class="topbar-right">
-  <button id="settingsBtn" class="icon-btn" aria-label="Settings">⚙︎</button>
   <div class="segmented" role="tablist">
     <button id="tabEdit" role="tab" aria-selected="true">Edit</button>
     <button id="tabPresent" role="tab" aria-selected="false">Present</button>
-  </div>
   </div>
 </header>
 
@@ -41,7 +38,7 @@
 
   <section id="present" hidden>
     <div class="progress"><div id="progressFill"></div></div>
-    <p class="progress-text"><span id="progressText"></span><span id="brain" class="brain" hidden></span></p>
+    <p id="progressText" class="progress-text"></p>
     <div class="stage">
       <div id="highlight" class="highlight" aria-hidden="true"></div>
       <ol id="outline"></ol>
@@ -60,21 +57,6 @@
     <button id="nextBtn" class="round" aria-label="Next point">›</button>
   </div>
 </footer>
-
-<dialog id="settings">
-  <form method="dialog">
-    <h3>Smart following</h3>
-    <p class="muted">Claude helps follow the speaker even when they don't use the outline's words, and remembers the words they use so the app gets quicker over time.</p>
-    <label class="row"><input type="checkbox" id="aiToggle"> Use Claude</label>
-    <label for="codeInput">Access code</label>
-    <input id="codeInput" type="password" autocomplete="off" placeholder="Enter your access code">
-    <p id="libStats" class="muted"></p>
-    <div class="dialog-actions">
-      <button type="button" id="resetLib" class="danger">Forget learned words</button>
-      <button value="close" class="primary pill">Done</button>
-    </div>
-  </form>
-</dialog>
 
 <script src="matcher.js"></script>
 <script src="app.js"></script>
