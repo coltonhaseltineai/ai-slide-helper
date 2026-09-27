@@ -4,24 +4,71 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: write   # lets the build publish releases for automatic updates
+
 jobs:
   build:
     runs-on: macos-15
     defaults:
       run:
         working-directory: mac
+    env:
+      HAS_SIGNING: ${{ secrets.MAC_SIGNING_P12 != '' }}
+      HAS_UPDATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY != '' }}
     steps:
       - uses: actions/checkout@v4
+
       - name: Test matcher
         run: swift test
+
+      # A stable signing identity keeps microphone permission across updates.
+      - name: Load signing certificate
+        if: env.HAS_SIGNING == 'true'
+        env:
+          P12: ${{ secrets.MAC_SIGNING_P12 }}
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/build.keychain-db"
+          echo "$P12" | base64 --decode > "$RUNNER_TEMP/sign.p12"
+          security create-keychain -p ci "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p ci "$KEYCHAIN"
+          security import "$RUNNER_TEMP/sign.p12" -k "$KEYCHAIN" -P liveoutline -T /usr/bin/codesign
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ci "$KEYCHAIN" >/dev/null
+          sudo security add-trusted-cert -d -r trustRoot -p codeSign \
+            -k /Library/Keychains/System.keychain signing/LiveOutline.cer || echo "::warning::Could not mark certificate trusted"
+          echo "SIGN_IDENTITY=Live Outline Signing" >> "$GITHUB_ENV"
+
       - name: Build app bundle
-        run: ./scripts/build-app.sh
+        run: BUILD_NUMBER=${{ github.run_number }} ./scripts/build-app.sh
+
+      - name: Show signature
+        run: codesign -dr - "build/Live Outline.app" 2>&1 | tail -2
+
       - name: Zip app
         run: cd build && ditto -c -k --keepParent "Live Outline.app" LiveOutline.zip
+
       - uses: actions/upload-artifact@v4
         with:
           name: LiveOutline-mac
           path: mac/build/LiveOutline.zip
+
+      # Every push publishes a release; installed apps find it through appcast.xml.
+      - name: Publish update
+        if: github.event_name == 'push' && env.HAS_SIGNING == 'true' && env.HAS_UPDATE_KEY == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          BUILD: ${{ github.run_number }}
+        run: |
+          TAG="v1.$BUILD"
+          NOTES="$(git log -1 --format=%s)"
+          node scripts/make-appcast.js build/LiveOutline.zip "$BUILD" \
+            "https://github.com/${{ github.repository }}/releases/download/$TAG/LiveOutline.zip" \
+            "$NOTES" build/appcast.xml
+          gh release create "$TAG" build/LiveOutline.zip build/appcast.xml \
+            --target "${{ github.sha }}" --title "Live Outline 1.$BUILD" --notes "$NOTES" --latest
 
   web:
     runs-on: ubuntu-latest

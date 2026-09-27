@@ -14,6 +14,10 @@
     <key>LSApplicationCategoryType</key><string>public.app-category.productivity</string>
     <key>NSHighResolutionCapable</key><true/>
     <key>NSPrincipalClass</key><string>NSApplication</string>
+    <key>SUFeedURL</key><string>https://github.com/coltonhaseltineai/ai-slide-helper/releases/latest/download/appcast.xml</string>
+    <key>SUPublicEDKey</key><string>mPlsuLuzvk71+L/uNMIQx5aeqEBL8A1Y7UyICOBYce8=</string>
+    <key>SUEnableAutomaticChecks</key><true/>
+    <key>SUScheduledCheckInterval</key><integer>86400</integer>
     <key>NSMicrophoneUsageDescription</key><string>Live Outline listens to you speak so it can highlight the point you're on.</string>
     <key>NSSpeechRecognitionUsageDescription</key><string>Live Outline turns your speech into text to follow along with your outline.</string>
 </dict>

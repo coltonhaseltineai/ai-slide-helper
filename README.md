@@ -18,6 +18,10 @@ A native SwiftUI app lives in `mac/`. It uses Apple's built-in speech recognitio
 
 **Download:** open the latest *Mac app* run under the repo's **Actions** tab and download `LiveOutline-mac`. Unzip it and drag **Live Outline** to Applications. The app isn't notarized, so the first time you open it, right-click it and choose **Open**.
 
+**Automatic updates:** the app checks for new versions daily (or use **Live Outline → Check for Updates…**) and installs them in one click, via [Sparkle](https://sparkle-project.org). Every push to this branch publishes a signed release that installed apps pick up. This needs two repository secrets, set once under Settings → Secrets and variables → Actions:
+- `SPARKLE_PRIVATE_KEY`, which signs updates so the app only installs genuine ones.
+- `MAC_SIGNING_P12`, a signing certificate (base64 .p12, password `liveoutline`) so every version has the same identity and keeps its microphone permission.
+
 **Build it yourself** (macOS 14+ with the Xcode command line tools):
 ```
 cd mac
