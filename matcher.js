@@ -41,14 +41,36 @@
         const kws = new Set([...tokenize(it.text), ...it.cues.flatMap(tokenize)]);
         return Object.assign({}, it, { keywords: kws });
       });
-      const df = new Map();
-      this.items.forEach(it => it.keywords.forEach(k => df.set(k, (df.get(k) || 0) + 1)));
+      this.learned = this.items.map(() => new Set());
+      this.df = new Map();
+      this.items.forEach(it => it.keywords.forEach(k => this.df.set(k, (this.df.get(k) || 0) + 1)));
       const n = this.items.length || 1;
-      this.idf = k => Math.log(1 + n / (df.get(k) || 1));
+      this.idf = k => Math.log(1 + n / (this.df.get(k) || 1));
       this.current = this.items.length ? 0 : -1;
       this.words = [];
       this.pending = null;
       this.pendingCount = 0;
+    }
+
+    // Adds hint words ('hint') or words the speaker was heard using ('learned') to one item.
+    addKeywords(i, words, source = 'hint') {
+      const it = this.items[i];
+      if (!it) return 0;
+      let added = 0;
+      for (const k of tokenize((words || []).join(' '))) {
+        if (source === 'learned') this.learned[i].add(k);
+        if (it.keywords.has(k)) continue;
+        it.keywords.add(k);
+        this.df.set(k, (this.df.get(k) || 0) + 1);
+        added++;
+      }
+      return added;
+    }
+
+    // How many words in `text` belong to item i (e.g. "is the newest speech still about this point?").
+    hits(i, text) {
+      const it = this.items[i];
+      return it ? tokenize(text).filter(w => it.keywords.has(w)).length : 0;
     }
 
     setCurrent(i) { this.current = i; this.pending = null; this.pendingCount = 0; this.words = []; }
@@ -62,8 +84,9 @@
         if (it.keywords.has(w)) best.set(w, Math.pow(0.85, n - 1 - idx));
       });
       let s = 0;
-      best.forEach((wt, w) => { s += this.idf(w) * wt; });
-      s /= Math.sqrt(it.keywords.size);
+      best.forEach((wt, w) => { s += this.idf(w) * wt * (this.learned[i].has(w) ? 1.25 : 1); });
+      // Hint lists can be long, so dampen length less than plain line text would.
+      s /= Math.pow(it.keywords.size, 0.35);
       const d = i - this.current;
       if (d === 0 || d === 1) s *= 1.3;
       else if (d < 0) s *= 0.6;
@@ -111,6 +134,55 @@
     }
   }
 
-  const api = { tokenize, parseOutline, Matcher, WordFeeder };
+  // Remembers hint words and learned words per outline line, across talks.
+  class LearnedLibrary {
+    constructor(storage, key = 'liveOutline.library', cap = 60) {
+      this.storage = storage; this.key = key; this.cap = cap;
+      let data = null;
+      try { data = JSON.parse(storage && storage.getItem(key)); } catch (e) {}
+      this.data = data && typeof data === 'object' ? data : {};
+    }
+    static lineKey(text) { return tokenize(text).join(' ') || String(text).toLowerCase().trim(); }
+    entry(text) {
+      const k = LearnedLibrary.lineKey(text);
+      return this.data[k] || (this.data[k] = { hints: [], learned: {} });
+    }
+    has(text) { const e = this.data[LearnedLibrary.lineKey(text)]; return !!(e && e.hints.length); }
+    words(text) {
+      const e = this.data[LearnedLibrary.lineKey(text)];
+      return e ? { hints: e.hints.slice(), learned: Object.keys(e.learned) } : { hints: [], learned: [] };
+    }
+    setHints(text, words) { this.entry(text).hints = [...new Set(words)].slice(0, 40); }
+    // Returns how many words were new.
+    addLearned(text, words, now = Date.now()) {
+      const e = this.entry(text);
+      let added = 0;
+      for (const w of words) {
+        const k = String(w).toLowerCase().trim();
+        if (!k) continue;
+        if (!(k in e.learned)) added++;
+        e.learned[k] = now;
+      }
+      const keys = Object.keys(e.learned);
+      if (keys.length > this.cap) {
+        keys.sort((a, b) => e.learned[b] - e.learned[a]).slice(this.cap).forEach(k => delete e.learned[k]);
+      }
+      return added;
+    }
+    learnedCount() { return Object.values(this.data).reduce((n, e) => n + Object.keys(e.learned).length, 0); }
+    reset() { this.data = {}; this.save(); }
+    save() { try { this.storage && this.storage.setItem(this.key, JSON.stringify(this.data)); } catch (e) {} }
+  }
+
+  // Decides when to ask Claude where the speaker is: only when the local matcher seems unsure,
+  // plus an occasional check, and never while a request is already running.
+  function shouldLocate(s, o = {}) {
+    const unsureAfter = o.unsureAfter || 6000, every = o.every || 10000, minGap = o.minGap || 3000, minWords = o.minWords || 8;
+    if (s.inFlight || s.newWords < minWords) return false;
+    if (s.now - s.lastCallAt < minGap) return false;
+    return s.now - s.lastConfidentAt >= unsureAfter || s.now - s.lastCallAt >= every;
+  }
+
+  const api = { tokenize, parseOutline, Matcher, WordFeeder, LearnedLibrary, shouldLocate };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.OutlineMatcher = api;
 })(this);
