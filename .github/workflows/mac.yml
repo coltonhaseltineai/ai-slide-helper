@@ -3,6 +3,7 @@ name: Mac app
 on:
   push:
   pull_request:
+  workflow_dispatch:   # "Run workflow" button: publish a release without a code change
 
 permissions:
   contents: write   # lets the build publish releases for automatic updates
@@ -56,7 +57,7 @@ jobs:
 
       # Every push publishes a release; installed apps find it through appcast.xml.
       - name: Publish update
-        if: github.event_name == 'push' && env.HAS_SIGNING == 'true' && env.HAS_UPDATE_KEY == 'true'
+        if: github.event_name != 'pull_request' && env.HAS_SIGNING == 'true' && env.HAS_UPDATE_KEY == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
