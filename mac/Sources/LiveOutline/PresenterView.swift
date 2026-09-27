@@ -86,6 +86,14 @@ struct PresenterView: View {
                         .matchedGeometryEffect(id: "highlight", in: highlight)
                 }
             }
+            .overlay(alignment: .trailing) {
+                if let flash = model.learnedFlash, flash.index == item.id, !flash.words.isEmpty {
+                    LearnedFlashView(words: flash.words)
+                        .padding(.trailing, 16)
+                        .transition(.move(edge: .trailing).combined(with: .opacity))
+                }
+            }
+            .animation(.spring(response: 0.4, dampingFraction: 0.8), value: model.learnedFlash)
             .padding(.leading, CGFloat(item.level) * 36)
             .contentShape(Rectangle())
     }
@@ -180,5 +188,26 @@ private struct LevelMeter: View {
             }
         }
         .animation(.easeOut(duration: 0.12), value: level)
+    }
+}
+
+/// "Learned: blue light, pillow" — shown briefly when Live Outline picks up new words for a point.
+private struct LearnedFlashView: View {
+    let words: [String]
+
+    var body: some View {
+        Label {
+            Text("Learned: " + words.prefix(4).joined(separator: ", "))
+                .lineLimit(1)
+        } icon: {
+            Image(systemName: "brain")
+        }
+        .font(.callout.weight(.medium))
+        .foregroundStyle(Color.accentColor)
+        .padding(.horizontal, 12).padding(.vertical, 6)
+        .background(.regularMaterial, in: Capsule())
+        .overlay(Capsule().strokeBorder(Color.accentColor.opacity(0.3)))
+        .shadow(color: .black.opacity(0.1), radius: 8, y: 3)
+        .frame(maxWidth: 340, alignment: .trailing)
     }
 }

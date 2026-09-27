@@ -228,6 +228,17 @@ public struct LearnedLibrary: Codable, Equatable, Sendable {
         return added
     }
 
+    /// Forgets one learned word for a line.
+    public mutating func removeLearned(_ text: String, _ word: String) {
+        entries[Self.lineKey(text)]?.learned[word.lowercased()] = nil
+    }
+
+    /// Learned words for a line, newest first.
+    public func learnedWords(_ text: String) -> [String] {
+        guard let e = entries[Self.lineKey(text)] else { return [] }
+        return e.learned.sorted { $0.value != $1.value ? $0.value > $1.value : $0.key < $1.key }.map(\.key)
+    }
+
     public var learnedCount: Int { entries.values.reduce(0) { $0 + $1.learned.count } }
 }
 

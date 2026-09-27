@@ -35,6 +35,14 @@ final class AppModel {
     var aiDisabledReason: String?
     private(set) var library: LearnedLibrary
     private(set) var learnedPulse = 0
+    /// Words just learned for a point, shown briefly beside it while presenting.
+    private(set) var learnedFlash: LearnedFlash?
+
+    struct LearnedFlash: Equatable {
+        let id = UUID()
+        let index: Int
+        let words: [String]
+    }
 
     /// Words from the current recognition pass that were already given to the matcher.
     private var fedWordCount = 0
@@ -119,6 +127,22 @@ final class AppModel {
     }
 
     func step(_ delta: Int) { select(current + delta) }
+
+    /// Learned words for an outline line, newest first.
+    func learnedWords(for text: String) -> [String] { library.learnedWords(text) }
+
+    func removeLearned(_ word: String, for text: String) {
+        library.removeLearned(text, word)
+        saveLibrary()
+    }
+
+    /// Lets you teach a word yourself. Takes effect the next time you present.
+    func addLearned(_ word: String, for text: String) {
+        let w = word.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !w.isEmpty else { return }
+        library.addLearned(text, [w])
+        saveLibrary()
+    }
 
     func resetLibrary() {
         library = LearnedLibrary()
@@ -241,9 +265,18 @@ final class AppModel {
     private func learn(_ index: Int, _ words: [String]) {
         guard !words.isEmpty, matcher.items.indices.contains(index) else { return }
         matcher.addKeywords(index, words, source: .learned)
-        if library.addLearned(matcher.items[index].text, words) > 0 {
-            saveLibrary()
-            learnedPulse += 1
+        let text = matcher.items[index].text
+        let known = Set(library.learnedWords(text))
+        let fresh = Array(Set(words.map { $0.lowercased().trimmingCharacters(in: .whitespaces) }))
+            .filter { !$0.isEmpty && !known.contains($0) }.sorted()
+        guard library.addLearned(text, words) > 0 else { return }
+        saveLibrary()
+        learnedPulse += 1
+        let flash = LearnedFlash(index: index, words: fresh)
+        learnedFlash = flash
+        Task {
+            try? await Task.sleep(for: .seconds(4))
+            if learnedFlash == flash { learnedFlash = nil }
         }
     }
 

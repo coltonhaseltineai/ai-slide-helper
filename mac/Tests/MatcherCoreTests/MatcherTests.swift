@@ -74,4 +74,15 @@ final class MatcherTests: XCTestCase {
         XCTAssertFalse(shouldLocate(now: 20, lastCallAt: 9, lastConfidentAt: 19, newWords: 10, inFlight: true))
         XCTAssertFalse(shouldLocate(now: 20, lastCallAt: 9, lastConfidentAt: 19, newWords: 3, inFlight: false))
     }
+
+    func testRemoveAndListLearnedWords() {
+        var lib = LearnedLibrary()
+        lib.addLearned("Immune health", ["germs"], now: 1)
+        lib.addLearned("Immune health", ["White Cells", "flu"], now: 2)
+        XCTAssertEqual(lib.learnedWords("Immune health"), ["flu", "white cells", "germs"])
+        lib.removeLearned("immune HEALTH", "White Cells")
+        XCTAssertEqual(lib.learnedWords("Immune health"), ["flu", "germs"])
+        XCTAssertEqual(lib.learnedCount, 2)
+        lib.removeLearned("Unknown line", "x")   // no-op
+    }
 }

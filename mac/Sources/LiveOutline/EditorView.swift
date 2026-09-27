@@ -25,7 +25,12 @@ struct EditorView: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Text("Preview").font(.headline)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Preview").font(.headline)
+                        Text("Tags are words Live Outline has learned. Remove wrong ones or add your own.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
                     Button {
                         model.toggleMode()
@@ -39,6 +44,7 @@ struct EditorView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 6) {
                         ForEach(model.previewItems) { item in
+                            VStack(alignment: .leading, spacing: 4) {
                             HStack(alignment: .firstTextBaseline, spacing: 8) {
                                 Circle()
                                     .fill(item.level == 0 ? Color.accentColor : Color.secondary.opacity(0.5))
@@ -53,7 +59,11 @@ struct EditorView: View {
                                         .background(.quaternary, in: Capsule())
                                 }
                             }
+                            LearnedWordsRow(lineText: item.text)
+                                .padding(.leading, 15)
+                            }
                             .padding(.leading, CGFloat(item.level) * 22)
+                            .padding(.bottom, 4)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
