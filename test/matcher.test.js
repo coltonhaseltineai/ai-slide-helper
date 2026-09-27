@@ -45,3 +45,21 @@ test('a single stray word does not cause a jump', () => {
   m.feed('screens');
   assert.strictEqual(m.current, 0);
 });
+
+const { WordFeeder } = require('../matcher.js');
+
+test('feeder hands out settled words in small groups', () => {
+  const f = new WordFeeder(3);
+  assert.strictEqual(f.update(0, 'why does', false), '');
+  assert.strictEqual(f.update(0, 'why does sleep', false), '');
+  assert.strictEqual(f.update(0, 'why does sleep matter', false), 'why does sleep');
+  assert.strictEqual(f.update(0, 'why does sleep matter so', false), '');
+  assert.strictEqual(f.update(0, 'why does sleep matter so much', true), 'matter so much');
+  assert.strictEqual(f.update(1, 'next', true), 'next');
+});
+
+test('feeder recovers when a result is rewritten shorter', () => {
+  const f = new WordFeeder(2);
+  assert.strictEqual(f.update(0, 'a b c d', false), 'a b c');
+  assert.strictEqual(f.update(0, 'x y', true), 'x y');
+});

@@ -90,6 +90,27 @@
     }
   }
 
-  const api = { tokenize, parseOutline, Matcher };
+  // Speech results grow word by word. This hands out only the new, settled words
+  // in small groups so the highlight can react mid-sentence.
+  class WordFeeder {
+    constructor(minWords = 3) { this.minWords = minWords; this.fed = new Map(); }
+    reset() { this.fed.clear(); }
+    // key identifies one recognition result; text is its full transcript so far.
+    update(key, text, isFinal) {
+      const words = (text || '').trim().split(/\s+/).filter(Boolean);
+      let done = this.fed.get(key) || 0;
+      if (words.length < done) done = 0; // the recognizer rewrote this result
+      const settled = isFinal ? words.length : Math.max(words.length - 1, 0);
+      let chunk = '';
+      if (settled - done >= this.minWords || (isFinal && settled > done)) {
+        chunk = words.slice(done, settled).join(' ');
+        done = settled;
+      }
+      if (isFinal) this.fed.delete(key); else this.fed.set(key, done);
+      return chunk;
+    }
+  }
+
+  const api = { tokenize, parseOutline, Matcher, WordFeeder };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.OutlineMatcher = api;
 })(this);

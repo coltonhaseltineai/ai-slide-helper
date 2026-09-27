@@ -2,32 +2,61 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Live Outline</title>
+<meta name="description" content="An outline that follows your voice and highlights the point you're on.">
+<meta name="theme-color" content="#f6f5fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101014" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Live Outline">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
+<header class="topbar">
   <h1>Live Outline</h1>
-  <div class="controls">
-    <button id="modeBtn">Present</button>
-    <button id="micBtn" disabled>🎤 Start listening</button>
-    <button id="fsBtn" title="Fullscreen">⛶</button>
+  <div class="segmented" role="tablist">
+    <button id="tabEdit" role="tab" aria-selected="true">Edit</button>
+    <button id="tabPresent" role="tab" aria-selected="false">Present</button>
   </div>
 </header>
-<p id="notice" hidden></p>
 
-<section id="edit">
-  <label for="outlineInput">Paste your outline. Indent to nest items. Add hidden hints with <code>[cues: word, word]</code>.</label>
-  <textarea id="outlineInput" spellcheck="false"></textarea>
-</section>
+<div id="notice" class="notice" hidden></div>
 
-<section id="present" hidden>
-  <ol id="outline"></ol>
-  <p class="hint">The highlight follows your voice. Use ← → or click a line to correct it.</p>
-</section>
+<main>
+  <section id="edit">
+    <label for="outlineInput">One point per line. Indent to nest. Add hidden hints with <code>[cues: word, word]</code>.</label>
+    <textarea id="outlineInput" spellcheck="false" autocapitalize="sentences"></textarea>
+    <h2>Preview</h2>
+    <ul id="preview"></ul>
+    <button id="presentBtn" class="primary big">▶ Present</button>
+  </section>
 
-<footer id="ticker" aria-live="polite"></footer>
+  <section id="present" hidden>
+    <div class="progress"><div id="progressFill"></div></div>
+    <p id="progressText" class="progress-text"></p>
+    <div class="stage">
+      <div id="highlight" class="highlight" aria-hidden="true"></div>
+      <ol id="outline"></ol>
+    </div>
+  </section>
+</main>
+
+<footer id="dock" class="dock" hidden>
+  <div id="ticker" class="ticker" aria-live="polite"></div>
+  <div class="dock-row">
+    <button id="prevBtn" class="round" aria-label="Previous point">‹</button>
+    <button id="micBtn" class="mic" aria-label="Start listening">
+      <span class="mic-icon" aria-hidden="true"></span>
+      <span id="micLabel">Listen</span>
+    </button>
+    <button id="nextBtn" class="round" aria-label="Next point">›</button>
+  </div>
+</footer>
 
 <script src="matcher.js"></script>
 <script src="app.js"></script>
