@@ -1,0 +1,30 @@
+name: Mac app
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: mac
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test matcher
+        run: swift test
+      - name: Build app bundle
+        run: ./scripts/build-app.sh
+      - name: Zip app
+        run: cd build && ditto -c -k --keepParent "Live Outline.app" LiveOutline.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LiveOutline-mac
+          path: mac/build/LiveOutline.zip
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: node --test
