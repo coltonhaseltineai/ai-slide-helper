@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Outline</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>Live Outline</h1>
+  <div class="controls">
+    <button id="modeBtn">Present</button>
+    <button id="micBtn" disabled>🎤 Start listening</button>
+    <button id="fsBtn" title="Fullscreen">⛶</button>
+  </div>
+</header>
+<p id="notice" hidden></p>
+
+<section id="edit">
+  <label for="outlineInput">Paste your outline. Indent to nest items. Add hidden hints with <code>[cues: word, word]</code>.</label>
+  <textarea id="outlineInput" spellcheck="false"></textarea>
+</section>
+
+<section id="present" hidden>
+  <ol id="outline"></ol>
+  <p class="hint">The highlight follows your voice. Use ← → or click a line to correct it.</p>
+</section>
+
+<footer id="ticker" aria-live="polite"></footer>
+
+<script src="matcher.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
