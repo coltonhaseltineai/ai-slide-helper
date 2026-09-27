@@ -154,7 +154,7 @@ private struct LevelMeter: View {
     var body: some View {
         HStack(spacing: 3) {
             ForEach(0..<bars, id: \.self) { i in
-                let shape = [0.5, 0.8, 1.0, 0.8, 0.5][i]
+                let shape: CGFloat = [0.5, 0.8, 1.0, 0.8, 0.5][i]
                 Capsule()
                     .fill(level > 0.01 ? Color.accentColor : Color.secondary.opacity(0.4))
                     .frame(width: 4, height: max(4, 22 * CGFloat(level) * shape))
