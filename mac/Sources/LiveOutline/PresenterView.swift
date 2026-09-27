@@ -106,9 +106,28 @@ private struct ProgressHeader: View {
                 }
             }
             .frame(height: 4)
-            Text("\(model.current + 1) of \(model.items.count)")
-                .font(.caption.monospacedDigit())
-                .foregroundStyle(.secondary)
+            HStack(spacing: 8) {
+                Text("\(model.current + 1) of \(model.items.count)")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                if model.learnedCount > 0 {
+                    Label("\(model.learnedCount) learned", systemImage: "brain")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.accentColor)
+                        .padding(.horizontal, 8).padding(.vertical, 2)
+                        .background(Color.accentColor.opacity(0.14), in: Capsule())
+                        .contentTransition(.numericText())
+                        .symbolEffect(.bounce, value: model.learnedPulse)
+                        .help("Words Live Outline has learned from how you speak")
+                }
+                if let reason = model.aiDisabledReason {
+                    Label("Smart following off", systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                        .help(reason + " Change this in Settings (⌘,).")
+                }
+            }
+            .animation(.snappy, value: model.learnedCount)
         }
         .padding(.horizontal, 48)
         .padding(.top, 16)

@@ -25,14 +25,46 @@ final class AppModel {
     private(set) var current = 0
     let listener = SpeechListener()
 
+    // Smart following (Claude)
+    var aiEnabled: Bool {
+        didSet { UserDefaults.standard.set(aiEnabled, forKey: "aiEnabled"); aiDisabledReason = nil }
+    }
+    var accessCode: String {
+        didSet { UserDefaults.standard.set(accessCode, forKey: "accessCode"); aiDisabledReason = nil }
+    }
+    var aiDisabledReason: String?
+    private(set) var library: LearnedLibrary
+    private(set) var learnedPulse = 0
+
     /// Words from the current recognition pass that were already given to the matcher.
     private var fedWordCount = 0
+    private var chunks: [(time: Date, text: String)] = []
+    private var lastCallAt = Date.distantPast
+    private var lastConfidentAt = Date()
+    private var newWords = 0
+    private var locateTask: Task<Void, Never>?
+    private var teachTask: Task<Void, Never>?
+    private var expandTask: Task<Void, Never>?
+    private var lastTeachAt = Date.distantPast
+    private var ticker: Timer?
 
     var items: [OutlineItem] { matcher.items }
     var previewItems: [OutlineItem] { parseOutline(outlineText) }
+    var learnedCount: Int { library.learnedCount }
+    private var aiOn: Bool { aiEnabled && aiDisabledReason == nil }
+    private var client: SmartClient { SmartClient(accessCode: accessCode) }
 
     init() {
-        outlineText = UserDefaults.standard.string(forKey: "outline") ?? Self.sample
+        let defaults = UserDefaults.standard
+        outlineText = defaults.string(forKey: "outline") ?? Self.sample
+        aiEnabled = defaults.object(forKey: "aiEnabled") as? Bool ?? true
+        accessCode = defaults.string(forKey: "accessCode") ?? ""
+        if let data = defaults.data(forKey: "library"),
+           let saved = try? JSONDecoder().decode(LearnedLibrary.self, from: data) {
+            library = saved
+        } else {
+            library = LearnedLibrary()
+        }
         listener.onTranscript = { [weak self] text, isFinal in
             self?.handle(text: text, isFinal: isFinal)
         }
@@ -43,24 +75,55 @@ final class AppModel {
             matcher = Matcher(items: parseOutline(outlineText))
             current = max(matcher.current, 0)
             listener.contextualStrings = matcher.items.flatMap { [$0.text] + $0.cues }
+            chunks = []
+            lastCallAt = Date()
+            lastConfidentAt = Date()
+            newWords = 0
+            locateTask?.cancel()
+            loadLibrary()
             mode = .present
         } else {
-            listener.stop()
+            stopListening()
             mode = .edit
         }
     }
 
     func toggleListening() {
         guard mode == .present else { return }
-        if listener.isListening { listener.stop() } else { fedWordCount = 0; listener.start() }
+        if listener.isListening {
+            stopListening()
+        } else {
+            fedWordCount = 0
+            listener.start()
+            // "Unsure for a while" can happen between words, so check on a timer too.
+            ticker = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
+                Task { @MainActor in self?.maybeLocate() }
+            }
+        }
     }
 
+    private func stopListening() {
+        listener.stop()
+        ticker?.invalidate()
+        ticker = nil
+    }
+
+    /// Moves the highlight by hand; Claude learns from the correction.
     func select(_ index: Int) {
+        let before = matcher.current
         matcher.setCurrent(index)
         current = matcher.current
+        guard current != before else { return }
+        lastConfidentAt = Date()
+        teachSoon()
     }
 
     func step(_ delta: Int) { select(current + delta) }
+
+    func resetLibrary() {
+        library = LearnedLibrary()
+        saveLibrary()
+    }
 
     /// Speech arrives as a growing transcript; feed only the words that are new and settled.
     private func handle(text: String, isFinal: Bool) {
@@ -71,9 +134,130 @@ final class AppModel {
         if settled - fedWordCount >= 3 || (isFinal && settled > fedWordCount) {
             let chunk = words[fedWordCount..<settled].joined(separator: " ")
             fedWordCount = settled
-            let next = matcher.feed(chunk)
-            if next != current { current = next }
+            feed(chunk)
         }
         if isFinal { fedWordCount = 0 }
+    }
+
+    private func feed(_ chunk: String) {
+        let now = Date()
+        chunks.append((now, chunk))
+        chunks.removeAll { now.timeIntervalSince($0.time) > 60 }
+        newWords += chunk.split(whereSeparator: \.isWhitespace).count
+        let before = current
+        current = matcher.feed(chunk)
+        if current != before || matcher.hits(current, chunk) > 0 { lastConfidentAt = now }
+        maybeLocate()
+    }
+
+    private func recentTranscript(_ seconds: TimeInterval = 25) -> String {
+        let now = Date()
+        return chunks.filter { now.timeIntervalSince($0.time) < seconds }.map(\.text).joined(separator: " ")
+    }
+
+    // MARK: - Claude
+
+    /// Puts saved hint and learned words onto the outline, then fetches hints for any new lines.
+    private func loadLibrary() {
+        for (i, item) in matcher.items.enumerated() {
+            let w = library.words(item.text)
+            matcher.addKeywords(i, w.hints, source: .hint)
+            matcher.addKeywords(i, w.learned, source: .learned)
+        }
+        let items = matcher.items
+        guard aiOn, !items.isEmpty, !items.allSatisfy({ library.has($0.text) }) else { return }
+        let m = matcher
+        expandTask?.cancel()
+        expandTask = Task {
+            do {
+                let result = try await client.expand(items: items.map(\.text))
+                for (i, words) in result.hints.enumerated() where i < items.count {
+                    guard !words.isEmpty, !library.has(items[i].text) else { continue }
+                    library.setHints(items[i].text, words)
+                    m.addKeywords(i, words, source: .hint)
+                }
+                saveLibrary()
+            } catch {
+                aiFailed(error)
+            }
+        }
+    }
+
+    private func maybeLocate() {
+        guard mode == .present, aiOn else { return }
+        let now = Date().timeIntervalSince1970
+        guard shouldLocate(now: now, lastCallAt: lastCallAt.timeIntervalSince1970,
+                           lastConfidentAt: lastConfidentAt.timeIntervalSince1970,
+                           newWords: newWords, inFlight: locateTask != nil) else { return }
+        let transcript = recentTranscript()
+        guard !transcript.isEmpty else { return }
+        lastCallAt = Date()
+        newWords = 0
+        let m = matcher, asked = current, texts = matcher.items.map(\.text)
+        locateTask = Task {
+            defer { locateTask = nil }
+            do {
+                let r = try await client.locate(items: texts, current: asked, transcript: transcript)
+                guard m === matcher, texts.indices.contains(r.index) else { return }
+                // Don't override a correction the user made while Claude was thinking.
+                if r.confidence == "high", r.index != current, current == asked {
+                    matcher.setCurrent(r.index)
+                    current = r.index
+                }
+                if r.confidence == "high" || (r.confidence == "medium" && r.index == current) {
+                    learn(r.index, r.learned)
+                    lastConfidentAt = Date()
+                }
+            } catch {
+                aiFailed(error)
+            }
+        }
+    }
+
+    /// Waits for taps to settle, then teaches Claude's pick of words for the chosen point.
+    private func teachSoon() {
+        teachTask?.cancel()
+        teachTask = Task {
+            try? await Task.sleep(for: .seconds(1.5))
+            guard !Task.isCancelled else { return }
+            await teach(current)
+        }
+    }
+
+    private func teach(_ index: Int) async {
+        guard aiOn, Date().timeIntervalSince(lastTeachAt) > 4 else { return }
+        let transcript = recentTranscript(15)
+        guard transcript.split(whereSeparator: \.isWhitespace).count >= 6 else { return }
+        lastTeachAt = Date()
+        let m = matcher
+        do {
+            let r = try await client.locate(items: m.items.map(\.text), current: index, transcript: transcript, known: index)
+            if m === matcher { learn(index, r.learned) }
+        } catch {
+            aiFailed(error)
+        }
+    }
+
+    private func learn(_ index: Int, _ words: [String]) {
+        guard !words.isEmpty, matcher.items.indices.contains(index) else { return }
+        matcher.addKeywords(index, words, source: .learned)
+        if library.addLearned(matcher.items[index].text, words) > 0 {
+            saveLibrary()
+            learnedPulse += 1
+        }
+    }
+
+    private func saveLibrary() {
+        if let data = try? JSONEncoder().encode(library) {
+            UserDefaults.standard.set(data, forKey: "library")
+        }
+    }
+
+    /// Stops calling Claude for this session after a setup problem, and says why once.
+    private func aiFailed(_ error: Error) {
+        if error is CancellationError { return }
+        if let e = error as? SmartClient.APIError, e.isSetupProblem {
+            aiDisabledReason = e.status == 404 ? "Smart following isn't available on the server yet." : e.message
+        }
     }
 }

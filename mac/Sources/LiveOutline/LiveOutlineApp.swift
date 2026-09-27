@@ -28,5 +28,9 @@ struct LiveOutlineApp: App {
                     .disabled(model.mode != .present)
             }
         }
+        Settings {
+            SettingsView()
+                .environment(model)
+        }
     }
 }

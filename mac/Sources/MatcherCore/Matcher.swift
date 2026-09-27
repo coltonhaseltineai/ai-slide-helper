@@ -81,8 +81,9 @@ public final class Matcher {
 
     public let items: [OutlineItem]
     public private(set) var current: Int
-    private let keywords: [Set<String>]
-    private let docFreq: [String: Int]
+    private var keywords: [Set<String>]
+    private var learned: [Set<String>]
+    private var docFreq: [String: Int]
     private let options: Options
     private var words: [String] = []
     private var pending: Int?
@@ -92,6 +93,7 @@ public final class Matcher {
         self.items = items
         self.options = options
         self.keywords = items.map { Set(tokenize($0.text) + $0.cues.flatMap(tokenize)) }
+        self.learned = items.map { _ in [] }
         var df: [String: Int] = [:]
         for set in keywords { for k in set { df[k, default: 0] += 1 } }
         self.docFreq = df
@@ -100,6 +102,29 @@ public final class Matcher {
 
     private func idf(_ k: String) -> Double {
         log(1 + Double(max(items.count, 1)) / Double(docFreq[k] ?? 1))
+    }
+
+    public enum KeywordSource: Sendable { case hint, learned }
+
+    /// Adds hint words, or words the speaker was heard using, to one item. Returns how many were new.
+    @discardableResult
+    public func addKeywords(_ i: Int, _ words: [String], source: KeywordSource = .hint) -> Int {
+        guard items.indices.contains(i) else { return 0 }
+        var added = 0
+        for k in tokenize(words.joined(separator: " ")) {
+            if source == .learned { learned[i].insert(k) }
+            if keywords[i].contains(k) { continue }
+            keywords[i].insert(k)
+            docFreq[k, default: 0] += 1
+            added += 1
+        }
+        return added
+    }
+
+    /// How many words in `text` belong to item i.
+    public func hits(_ i: Int, _ text: String) -> Int {
+        guard items.indices.contains(i) else { return 0 }
+        return tokenize(text).filter { keywords[i].contains($0) }.count
     }
 
     /// Moves the highlight manually; matching continues from here.
@@ -120,8 +145,9 @@ public final class Matcher {
         for (idx, w) in words.enumerated() where kws.contains(w) {
             recency[w] = pow(0.85, Double(n - 1 - idx))
         }
-        var s = recency.reduce(0) { $0 + idf($1.key) * $1.value }
-        s /= Double(kws.count).squareRoot()
+        var s = recency.reduce(0) { $0 + idf($1.key) * $1.value * (learned[i].contains($1.key) ? 1.25 : 1) }
+        // Hint lists can be long, so dampen length less than plain line text would.
+        s /= pow(Double(kws.count), 0.35)
         let d = i - current
         if d == 0 || d == 1 { s *= 1.3 }
         else if d < 0 { s *= 0.6 }
@@ -151,4 +177,65 @@ public final class Matcher {
         }
         return current
     }
+}
+
+/// Remembers hint words and learned words per outline line, across talks.
+public struct LearnedLibrary: Codable, Equatable, Sendable {
+    public struct Entry: Codable, Equatable, Sendable {
+        public var hints: [String] = []
+        public var learned: [String: Double] = [:]   // word -> when it was last heard
+    }
+
+    public var entries: [String: Entry] = [:]
+    public var cap = 60
+
+    public init() {}
+
+    public static func lineKey(_ text: String) -> String {
+        let k = tokenize(text).joined(separator: " ")
+        return k.isEmpty ? text.lowercased().trimmingCharacters(in: .whitespaces) : k
+    }
+
+    public func has(_ text: String) -> Bool { !(entries[Self.lineKey(text)]?.hints.isEmpty ?? true) }
+
+    public func words(_ text: String) -> (hints: [String], learned: [String]) {
+        guard let e = entries[Self.lineKey(text)] else { return ([], []) }
+        return (e.hints, Array(e.learned.keys))
+    }
+
+    public mutating func setHints(_ text: String, _ words: [String]) {
+        var seen = Set<String>()
+        entries[Self.lineKey(text), default: Entry()].hints = Array(words.filter { seen.insert($0).inserted }.prefix(40))
+    }
+
+    /// Returns how many words were new.
+    @discardableResult
+    public mutating func addLearned(_ text: String, _ words: [String], now: Double = Date().timeIntervalSince1970) -> Int {
+        let key = Self.lineKey(text)
+        var e = entries[key, default: Entry()]
+        var added = 0
+        for w in words {
+            let k = w.lowercased().trimmingCharacters(in: .whitespaces)
+            if k.isEmpty { continue }
+            if e.learned[k] == nil { added += 1 }
+            e.learned[k] = now
+        }
+        if e.learned.count > cap {
+            let keep = e.learned.sorted { $0.value > $1.value }.prefix(cap)
+            e.learned = Dictionary(uniqueKeysWithValues: keep.map { ($0.key, $0.value) })
+        }
+        entries[key] = e
+        return added
+    }
+
+    public var learnedCount: Int { entries.values.reduce(0) { $0 + $1.learned.count } }
+}
+
+/// Decides when to ask Claude where the speaker is: only when the local matcher seems unsure,
+/// plus an occasional check, and never while a request is already running. Times are in seconds.
+public func shouldLocate(now: Double, lastCallAt: Double, lastConfidentAt: Double, newWords: Int, inFlight: Bool,
+                         unsureAfter: Double = 6, every: Double = 10, minGap: Double = 3, minWords: Int = 8) -> Bool {
+    if inFlight || newWords < minWords { return false }
+    if now - lastCallAt < minGap { return false }
+    return now - lastConfidentAt >= unsureAfter || now - lastCallAt >= every
 }
