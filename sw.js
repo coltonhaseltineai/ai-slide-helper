@@ -1,7 +1,7 @@
 // Caches the app so it opens instantly and works offline. Bump VERSION when files change.
-const VERSION = 'live-outline-v3';
+const VERSION = 'live-outline-v4';
 const FILES = ['./', 'index.html', 'styles.css', 'app.js', 'matcher.js', 'manifest.webmanifest',
-  'icons/icon-180.png', 'icons/icon-192.png'];
+  'icons/icon-180.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
