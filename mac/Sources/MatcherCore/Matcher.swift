@@ -250,3 +250,9 @@ public func shouldLocate(now: Double, lastCallAt: Double, lastConfidentAt: Doubl
     if now - lastCallAt < minGap { return false }
     return now - lastConfidentAt >= unsureAfter || now - lastCallAt >= every
 }
+
+/// Which tutorial pages to show: every page for someone new (lastSeen == 0),
+/// otherwise only pages for features added since they last saw the tutorial.
+public func tutorialPagesToShow(addedIn: [Int], lastSeen: Int) -> [Int] {
+    addedIn.indices.filter { lastSeen == 0 || addedIn[$0] > lastSeen }
+}

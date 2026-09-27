@@ -28,6 +28,13 @@ struct ContentView: View {
                 MicButton()
             }
         }
+        .sheet(item: Binding(
+            get: { model.tutorial },
+            set: { if $0 == nil, model.tutorial != nil { model.finishTutorial() } }
+        )) { t in
+            TutorialView(pages: t.pages, whatsNew: t.whatsNew) { model.finishTutorial() }
+        }
+        .task { model.showTutorialIfNeeded() }
         .alert("Can't listen", isPresented: Binding(
             get: { model.listener.errorMessage != nil },
             set: { if !$0 { model.listener.errorMessage = nil } }

@@ -19,6 +19,9 @@ struct LiveOutlineApp: App {
                 Button("Check for Updates…") { updater.checkForUpdates() }
                     .disabled(!updater.isAvailable)
             }
+            CommandGroup(replacing: .help) {
+                Button("Live Outline Tutorial") { model.showFullTutorial() }
+            }
             CommandMenu("Presentation") {
                 Button(model.mode == .present ? "Edit Outline" : "Start Presenting") { model.toggleMode() }
                     .keyboardShortcut("p", modifiers: [.command, .shift])

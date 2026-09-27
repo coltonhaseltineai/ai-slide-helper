@@ -85,4 +85,11 @@ final class MatcherTests: XCTestCase {
         XCTAssertEqual(lib.learnedCount, 2)
         lib.removeLearned("Unknown line", "x")   // no-op
     }
+
+    func testTutorialPagesToShow() {
+        let addedIn = [1, 1, 8, 13, 14]
+        XCTAssertEqual(tutorialPagesToShow(addedIn: addedIn, lastSeen: 0), [0, 1, 2, 3, 4])   // new user: everything
+        XCTAssertEqual(tutorialPagesToShow(addedIn: addedIn, lastSeen: 13), [4])              // after an update: what's new
+        XCTAssertEqual(tutorialPagesToShow(addedIn: addedIn, lastSeen: 14), [])               // up to date
+    }
 }

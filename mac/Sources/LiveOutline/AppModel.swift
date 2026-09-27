@@ -128,6 +128,34 @@ final class AppModel {
 
     func step(_ delta: Int) { select(current + delta) }
 
+    // MARK: - Tutorial
+
+    struct TutorialPresentation: Identifiable {
+        let id = UUID()
+        let pages: [TutorialPage]
+        let whatsNew: Bool
+    }
+
+    var tutorial: TutorialPresentation?
+
+    /// On launch: the full tour for new users, or just the pages for features added since last time.
+    func showTutorialIfNeeded() {
+        let lastSeen = UserDefaults.standard.integer(forKey: "tutorialSeen")
+        let pages = Tutorial.pagesToShow(lastSeen: lastSeen)
+        guard !pages.isEmpty else { return }
+        tutorial = TutorialPresentation(pages: pages, whatsNew: lastSeen != 0)
+    }
+
+    func showFullTutorial() {
+        tutorial = TutorialPresentation(pages: Tutorial.pages, whatsNew: false)
+    }
+
+    func finishTutorial() {
+        let seen = UserDefaults.standard.integer(forKey: "tutorialSeen")
+        UserDefaults.standard.set(max(seen, Tutorial.newest), forKey: "tutorialSeen")
+        tutorial = nil
+    }
+
     /// Learned words for an outline line, newest first.
     func learnedWords(for text: String) -> [String] { library.learnedWords(text) }
 
