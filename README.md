@@ -2,6 +2,9 @@
 
 A speaker pastes their talk outline, clicks **Present**, and then **Start listening**. As they talk, the app listens through the microphone and **bolds and highlights the outline line they're currently on**. The audience can always see where the speaker is, and nobody has to click through each line by hand.
 
+## iPhone
+Open **https://live-outline.vercel.app** in Safari, then tap Share → **Add to Home Screen**. Tap **Listen** to follow your voice, and swipe or use ‹ › to move by hand. If listening isn't allowed from the home-screen icon, open the same link in Safari.
+
 ## Mac app (recommended)
 A native SwiftUI app lives in `mac/`. It uses Apple's built-in speech recognition, which runs on your Mac when your Mac supports it.
 
