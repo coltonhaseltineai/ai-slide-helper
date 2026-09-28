@@ -1,0 +1,164 @@
+{
+ "split": "test",
+ "variant": "current",
+ "talks": [
+  "money",
+  "postmortem",
+  "toast",
+  "flu1918"
+ ],
+ "rows": [
+  {
+   "contender": "keywords",
+   "onCorrect": 15.8,
+   "lagP50": 18.1,
+   "lagP90": 25.3,
+   "missedSwitches": "26/34",
+   "wrongPer10": 8.8,
+   "flickerPer10": 0,
+   "callsPerMin": 0,
+   "latP50": null,
+   "latP90": null,
+   "errors": 0,
+   "perTalk": {
+    "money": 6,
+    "postmortem": 16,
+    "toast": 9,
+    "flu1918": 32
+   }
+  },
+  {
+   "contender": "statusquo",
+   "onCorrect": 61.8,
+   "lagP50": 8.6,
+   "lagP90": 17.4,
+   "missedSwitches": "1/34",
+   "wrongPer10": 11.8,
+   "flickerPer10": 1.5,
+   "callsPerMin": 7.9,
+   "latP50": 0.8,
+   "latP90": 0.8,
+   "errors": 0,
+   "perTalk": {
+    "money": 58,
+    "postmortem": 66,
+    "toast": 65,
+    "flu1918": 58
+   }
+  },
+  {
+   "contender": "tiny:potion:bare",
+   "onCorrect": 20.9,
+   "lagP50": 14.4,
+   "lagP90": 18,
+   "missedSwitches": "26/34",
+   "wrongPer10": 3.3,
+   "flickerPer10": 0,
+   "callsPerMin": 0,
+   "latP50": null,
+   "latP90": null,
+   "errors": 0,
+   "perTalk": {
+    "money": 10,
+    "postmortem": 20,
+    "toast": 15,
+    "flu1918": 38
+   }
+  },
+  {
+   "contender": "tiny:potion:prep",
+   "onCorrect": 38.6,
+   "lagP50": 10.7,
+   "lagP90": 20.4,
+   "missedSwitches": "18/34",
+   "wrongPer10": 3.7,
+   "flickerPer10": 0,
+   "callsPerMin": 0,
+   "latP50": null,
+   "latP90": null,
+   "errors": 0,
+   "perTalk": {
+    "money": 49,
+    "postmortem": 15,
+    "toast": 43,
+    "flu1918": 46
+   }
+  },
+  {
+   "contender": "tiny:bge-small:prep",
+   "onCorrect": 55.4,
+   "lagP50": 12.1,
+   "lagP90": 20,
+   "missedSwitches": "5/34",
+   "wrongPer10": 7.7,
+   "flickerPer10": 0,
+   "callsPerMin": 0,
+   "latP50": null,
+   "latP90": null,
+   "errors": 0,
+   "perTalk": {
+    "money": 64,
+    "postmortem": 48,
+    "toast": 46,
+    "flu1918": 64
+   }
+  },
+  {
+   "contender": "haiku",
+   "onCorrect": 75,
+   "lagP50": 9.3,
+   "lagP90": 16.8,
+   "missedSwitches": "1/34",
+   "wrongPer10": 0,
+   "flickerPer10": 0,
+   "callsPerMin": 19.2,
+   "latP50": 0.8,
+   "latP90": 0.8,
+   "errors": 0,
+   "perTalk": {
+    "money": 81,
+    "postmortem": 72,
+    "toast": 72,
+    "flu1918": 75
+   }
+  },
+  {
+   "contender": "sonnet",
+   "onCorrect": 72.7,
+   "lagP50": 8.8,
+   "lagP90": 12.5,
+   "missedSwitches": "0/34",
+   "wrongPer10": 1.5,
+   "flickerPer10": 0,
+   "callsPerMin": 19.2,
+   "latP50": 1.59,
+   "latP90": 1.59,
+   "errors": 0,
+   "perTalk": {
+    "money": 77,
+    "postmortem": 64,
+    "toast": 73,
+    "flu1918": 77
+   }
+  },
+  {
+   "contender": "oracle",
+   "onCorrect": 98.9,
+   "lagP50": 0,
+   "lagP90": 0,
+   "missedSwitches": "0/34",
+   "wrongPer10": 0,
+   "flickerPer10": 0,
+   "callsPerMin": 0,
+   "latP50": null,
+   "latP90": null,
+   "errors": 0,
+   "perTalk": {
+    "money": 99,
+    "postmortem": 99,
+    "toast": 99,
+    "flu1918": 99
+   }
+  }
+ ]
+}

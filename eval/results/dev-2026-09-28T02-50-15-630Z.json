@@ -1,0 +1,182 @@
+{
+ "split": "dev",
+ "variant": "current",
+ "talks": [
+  "sleep",
+  "quarterly",
+  "sourdough",
+  "heat",
+  "firstaid",
+  "stoicism"
+ ],
+ "rows": [
+  {
+   "contender": "keywords",
+   "onCorrect": 17.3,
+   "lagP50": 5.2,
+   "lagP90": 31.5,
+   "missedSwitches": "49/58",
+   "wrongPer10": 8.5,
+   "flickerPer10": 0.2,
+   "callsPerMin": 0,
+   "latP50": null,
+   "latP90": null,
+   "errors": 0,
+   "perTalk": {
+    "sleep": 12,
+    "quarterly": 24,
+    "sourdough": 15,
+    "heat": 8,
+    "firstaid": 23,
+    "stoicism": 22
+   }
+  },
+  {
+   "contender": "statusquo",
+   "onCorrect": 53.7,
+   "lagP50": 11.1,
+   "lagP90": 17.8,
+   "missedSwitches": "4/58",
+   "wrongPer10": 12.5,
+   "flickerPer10": 1.2,
+   "callsPerMin": 8.3,
+   "latP50": 0.8,
+   "latP90": 0.8,
+   "errors": 0,
+   "perTalk": {
+    "sleep": 53,
+    "quarterly": 45,
+    "sourdough": 66,
+    "heat": 41,
+    "firstaid": 60,
+    "stoicism": 57
+   }
+  },
+  {
+   "contender": "tiny:potion:bare",
+   "onCorrect": 24.6,
+   "lagP50": 4.6,
+   "lagP90": 22.1,
+   "missedSwitches": "43/58",
+   "wrongPer10": 3.2,
+   "flickerPer10": 0,
+   "callsPerMin": 0,
+   "latP50": null,
+   "latP90": null,
+   "errors": 0,
+   "perTalk": {
+    "sleep": 21,
+    "quarterly": 23,
+    "sourdough": 15,
+    "heat": 25,
+    "firstaid": 35,
+    "stoicism": 29
+   }
+  },
+  {
+   "contender": "tiny:potion:prep",
+   "onCorrect": 47.6,
+   "lagP50": 12,
+   "lagP90": 27.9,
+   "missedSwitches": "13/58",
+   "wrongPer10": 2.7,
+   "flickerPer10": 0,
+   "callsPerMin": 0,
+   "latP50": null,
+   "latP90": null,
+   "errors": 0,
+   "perTalk": {
+    "sleep": 48,
+    "quarterly": 28,
+    "sourdough": 53,
+    "heat": 55,
+    "firstaid": 48,
+    "stoicism": 55
+   }
+  },
+  {
+   "contender": "tiny:bge-small:prep",
+   "onCorrect": 63.7,
+   "lagP50": 8.3,
+   "lagP90": 16.5,
+   "missedSwitches": "5/58",
+   "wrongPer10": 5.1,
+   "flickerPer10": 0,
+   "callsPerMin": 0,
+   "latP50": null,
+   "latP90": null,
+   "errors": 0,
+   "perTalk": {
+    "sleep": 67,
+    "quarterly": 62,
+    "sourdough": 56,
+    "heat": 72,
+    "firstaid": 59,
+    "stoicism": 67
+   }
+  },
+  {
+   "contender": "haiku",
+   "onCorrect": 74.5,
+   "lagP50": 8.5,
+   "lagP90": 16,
+   "missedSwitches": "0/58",
+   "wrongPer10": 0.2,
+   "flickerPer10": 0,
+   "callsPerMin": 19.2,
+   "latP50": 0.8,
+   "latP90": 0.82,
+   "errors": 0,
+   "perTalk": {
+    "sleep": 75,
+    "quarterly": 78,
+    "sourdough": 72,
+    "heat": 71,
+    "firstaid": 81,
+    "stoicism": 70
+   }
+  },
+  {
+   "contender": "sonnet",
+   "onCorrect": 72.7,
+   "lagP50": 8.2,
+   "lagP90": 12.1,
+   "missedSwitches": "0/58",
+   "wrongPer10": 0.2,
+   "flickerPer10": 0,
+   "callsPerMin": 19.2,
+   "latP50": 1.59,
+   "latP90": 1.59,
+   "errors": 0,
+   "perTalk": {
+    "sleep": 74,
+    "quarterly": 68,
+    "sourdough": 75,
+    "heat": 70,
+    "firstaid": 77,
+    "stoicism": 72
+   }
+  },
+  {
+   "contender": "oracle",
+   "onCorrect": 98.7,
+   "lagP50": 0,
+   "lagP90": 0,
+   "missedSwitches": "0/58",
+   "wrongPer10": 0,
+   "flickerPer10": 0,
+   "callsPerMin": 0,
+   "latP50": null,
+   "latP90": null,
+   "errors": 0,
+   "perTalk": {
+    "sleep": 99,
+    "quarterly": 99,
+    "sourdough": 99,
+    "heat": 99,
+    "firstaid": 99,
+    "stoicism": 99
+   }
+  }
+ ]
+}

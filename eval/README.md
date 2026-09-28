@@ -38,3 +38,30 @@ the real answers will most likely lead to.
 
 Caveats: a subagent answers ~30 unrelated questions in one context, not one API call each. Its answer
 time is the median measured earlier on the API (Haiku 0.8 s, Sonnet 1.6 s), not measured live.
+
+## Results (all 10 talks, 68 min, 92 point switches)
+
+| Judge | On the right point | Catch-up p50 / p90 | Missed switches | Wrong jumps / 10 min | Answer time |
+|---|---|---|---|---|---|
+| Perfect follower (ceiling) | 98.8% | 0 / 0 s | 0 | 0 | – |
+| Claude Haiku 4.5 | **74.7%** | 8.5 / 16.0 s | 1 | 0.1 | 0.8 s |
+| Claude Sonnet 5 | 72.7% | 8.8 / 12.3 s | 0 | 0.7 | 1.6 s |
+| Tiny: bge-small + examples | 60.4% | 9.8 / 18.3 s | 10 | 6.2 | ~10 ms |
+| Old app (Haiku, high only, every 6–10 s) | 56.9% | 10.5 / 17.8 s | 5 | 12.2 | 0.8 s |
+| Tiny: potion + examples | 44.0% | 11.7 / 21.6 s | 31 | 3.1 | <1 ms |
+| Tiny: potion, outline only | 23.2% | 10.4 / 19.4 s | 69 | 3.2 | <1 ms |
+| Keywords | 16.7% | 10.3 / 26.7 s | 75 | 8.7 | – |
+
+Dev and test splits agree (Haiku 74.5% / 75.0%). Tiny-model settings were tuned on dev only
+(bge-small + examples: 63.7% dev, 55.4% test).
+
+What this says:
+- **Claude's interpretation is nearly perfect.** When it says "moved" it is almost always right (0.1 wrong
+  jumps per 10 min, 1 missed switch in 92). What it loses is **time**. Its first answer after a switch
+  (about 2 s in) is usually still "same" or "unclear", and it commits at the next question. The ~8 s
+  median catch-up accounts for nearly all of the gap to the ceiling.
+- **Tiny models alone are not good enough.** Even the best one (bge-small, with example sentences) is 14
+  points behind Claude and makes 60× more wrong jumps. Without example sentences they are barely better than
+  keywords. They are only a fallback for Macs without Apple Intelligence.
+- **Apple's on-device model** is asked twice as often (every 1 s, no network), so it can win on speed if
+  its interpretation holds up. Measure it on a Mac with Help → Compare Judges.
