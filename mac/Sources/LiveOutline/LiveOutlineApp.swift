@@ -1,7 +1,7 @@
 import Sparkle
 import SwiftUI
 
-@main
+/// Started by Launcher (which handles --self-test first).
 struct LiveOutlineApp: App {
     @State private var model = AppModel()
     private let updater = AppUpdater()
@@ -19,9 +19,7 @@ struct LiveOutlineApp: App {
                 Button("Check for Updates…") { updater.checkForUpdates() }
                     .disabled(!updater.isAvailable)
             }
-            CommandGroup(replacing: .help) {
-                Button("Live Outline Tutorial") { model.showFullTutorial() }
-            }
+            HelpCommands(model: model)
             CommandMenu("Presentation") {
                 Button(model.mode == .present ? "Edit Outline" : "Start Presenting") { model.toggleMode() }
                     .keyboardShortcut("p", modifiers: [.command, .shift])
@@ -37,9 +35,26 @@ struct LiveOutlineApp: App {
                     .disabled(model.mode != .present)
             }
         }
+        Window("Compare Judges", id: "compare") {
+            CompareView()
+                .environment(model)
+        }
+        .defaultSize(width: 900, height: 700)
         Settings {
             SettingsView()
                 .environment(model)
+        }
+    }
+}
+
+private struct HelpCommands: Commands {
+    let model: AppModel
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some Commands {
+        CommandGroup(replacing: .help) {
+            Button("Live Outline Tutorial") { model.showFullTutorial() }
+            Button("Compare Judges (Beta)…") { openWindow(id: "compare") }
         }
     }
 }

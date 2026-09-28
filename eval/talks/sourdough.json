@@ -1,0 +1,244 @@
+{
+ "schema": "live-outline-talk/1",
+ "id": "sourdough",
+ "title": "Sourdough Bread at Home",
+ "tier": "paraphrased",
+ "speaker": {
+  "persona": "Chatty home baker teaching a Saturday community-center class who digresses constantly and backtracks when she forgets a step",
+  "wpm": 160
+ },
+ "outlineText": "Why bother with sourdough\nThe starter\n  Feeding and maintenance [cues: discard]\nMixing the dough\nBulk fermentation\nShaping the loaf\nProofing [cues: banneton, fridge]\nScoring\nBaking\n  Steam and the Dutch oven\nTroubleshooting\n  Dense, gummy crumb\n  Flat loaves that spread",
+ "confusable": [
+  [
+   4,
+   6
+  ],
+  [
+   5,
+   7
+  ],
+  [
+   1,
+   2
+  ],
+  [
+   11,
+   12
+  ],
+  [
+   8,
+   9
+  ]
+ ],
+ "segments": [
+  {
+   "say": "Hi everybody, thanks for coming out on a Saturday. So, why would anybody spend two whole days on one bread when the store sells it for four bucks? My husband asks me weekly.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "For me it's the flavor, that tangy bite, and it keeps longer. But mostly it's just flour, water, salt, and wild yeast you caught yourself.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "Oh, quick thing, if you parked out back, the gate locks at noon. I learned that the hard way. Climbed over it. In clogs.",
+   "truth": 0,
+   "kind": "tangent"
+  },
+  {
+   "say": "Okay. So. Um, where do we even begin. Right.",
+   "truth": 1,
+   "kind": "transition",
+   "accept": [
+    0
+   ]
+  },
+  {
+   "say": "So everything starts with this jar. Just flour and water I left out until the wild yeasts and bacteria in my kitchen moved in. That bubbly, beery goop is what makes the bread rise.",
+   "truth": 1,
+   "kind": "on"
+  },
+  {
+   "say": "You can grow one in about a week, or just ask a friend for a spoonful. Mine's named Gertrude. Everybody names theirs.",
+   "truth": 1,
+   "kind": "on"
+  },
+  {
+   "say": "So how do you keep Gertrude alive? Every day, or weekly if she lives in the cold, you pour out most of her, keep a spoonful, and give her fresh flour and water. Breakfast.",
+   "truth": 2,
+   "kind": "on"
+  },
+  {
+   "say": "A few hours after her meal she peaks, doubled and bubbly, and that's when you use her. Little trick, drop a blob in water, and if it floats, she's ready.",
+   "truth": 2,
+   "kind": "on"
+  },
+  {
+   "say": "Okay, actually making bread. Big bowl, you stir together your flour, most of the water, and a scoop of that bubbly stuff, and it looks like a shaggy lumpy mess. That's correct.",
+   "truth": 3,
+   "kind": "on"
+  },
+  {
+   "say": "Then let it sit half an hour, add the salt with a splash more water, and squish it in with your hands. Squeeze, pinch, squish again. Your hands will be gross. Embrace it.",
+   "truth": 3,
+   "kind": "on"
+  },
+  {
+   "say": "Um, hang on, where's my scraper, the little plastic... has anybody... oh, it's in my apron. Sorry.",
+   "truth": 3,
+   "kind": "filler"
+  },
+  {
+   "say": "And later there's the overnight chill, where a lot of that sour flavor comes from, but don't let me jump ahead.",
+   "truth": 3,
+   "kind": "preview"
+  },
+  {
+   "say": "So now it sits in a clear tub on the counter for four to six hours. Every half hour at first, you wet your hand, stretch one side up and fold it over, turn the tub, go around.",
+   "truth": 4,
+   "kind": "on"
+  },
+  {
+   "say": "You want it grown by maybe half, puffy and domed, bubbles along the sides, and when you shake the tub it jiggles like jello. Then that first long rise is done.",
+   "truth": 4,
+   "kind": "on"
+  },
+  {
+   "say": "Alright, then you tip it out onto the counter, gently, nudge it into a loose ball, and let it relax twenty minutes.",
+   "truth": 5,
+   "kind": "on"
+  },
+  {
+   "say": "And pay attention to this next bit, because it matters again when we get to the razor blade.",
+   "truth": 5,
+   "kind": "preview"
+  },
+  {
+   "say": "Flip it over, fold the sides in like wrapping a present, roll it up toward you, and drag it on the counter till the outside is tight like a drum. That keeps it standing tall.",
+   "truth": 5,
+   "kind": "on"
+  },
+  {
+   "say": "Then, uh, right before it goes in, take your razor and make one confident slash down the length, at a low angle, like peeling off a thin layer.",
+   "truth": 7,
+   "kind": "skip"
+  },
+  {
+   "say": "People do wheat stalks and fancy leaves, gorgeous, but start with one line. The low angle gives you that crispy flap that lifts in the heat. Bakers call it the ear.",
+   "truth": 7,
+   "kind": "on"
+  },
+  {
+   "say": "Oh, wait. Wait, wait, wait. I skipped a whole step. After you roll it up tight, it has to rise one more time. Sorry, rewinding.",
+   "truth": 6,
+   "kind": "goback"
+  },
+  {
+   "say": "So you flip it upside down into a round wicker basket dusted with rice flour, cover it, and slide it into the cold overnight, like twelve to sixteen hours.",
+   "truth": 6,
+   "kind": "on"
+  },
+  {
+   "say": "The cold slows everything down, so more flavor, and it firms up. To check, poke it with a floured finger. If the dent springs back slowly and not all the way, it's ready.",
+   "truth": 6,
+   "kind": "on"
+  },
+  {
+   "say": "Same idea as reading the tub on the counter earlier, the jiggle and the domed top. You're just judging how much air's built up.",
+   "truth": 6,
+   "kind": "callback"
+  },
+  {
+   "say": "Okay, back to the razor. The nice thing about it coming straight out of the cold is it's firm, so the blade glides instead of dragging.",
+   "truth": 7,
+   "kind": "resume"
+  },
+  {
+   "say": "And remember that drum tight surface from when we rolled it up? This is where it pays off. A slack surface just bunches up under the blade.",
+   "truth": 7,
+   "kind": "callback"
+  },
+  {
+   "say": "Alright. Okay. Next. Um, yeah.",
+   "truth": 8,
+   "kind": "transition",
+   "accept": [
+    7
+   ]
+  },
+  {
+   "say": "So your oven goes as hot as it'll go, like four seventy five, and heats a full hour first. Then about forty five minutes in there.",
+   "truth": 8,
+   "kind": "on"
+  },
+  {
+   "say": "Oh, the smoke detector here is super sensitive. Last month the fire department showed up during cookie class, and they stayed for cookies.",
+   "truth": 8,
+   "kind": "tangent"
+  },
+  {
+   "say": "The trick at home is a heavy cast iron pot with a lid. Lid on, the moisture coming off the bread gets trapped, keeps the outside soft, and it springs way up.",
+   "truth": 9,
+   "kind": "on"
+  },
+  {
+   "say": "After twenty minutes, lid off, and a puff of hot vapor whooshes out. Now the air's dry, so the crust crisps and goes really dark for another twenty. Pale bread is sad bread.",
+   "truth": 9,
+   "kind": "on"
+  },
+  {
+   "say": "Oh shoot, going back a second, I forgot something about stirring the flour and water together in the big bowl. Use warm water, like bath water, especially in winter.",
+   "truth": 3,
+   "kind": "goback"
+  },
+  {
+   "say": "If the tap water's cold, everything after drags on for hours. I aim for about seventy eight degrees in the bowl. I literally stick a thermometer in it. My family thinks I'm nuts.",
+   "truth": 3,
+   "kind": "on"
+  },
+  {
+   "say": "Okay, anyway. So what happens when it all goes sideways? Because it will. My first ten attempts went straight in the trash.",
+   "truth": 10,
+   "kind": "resume"
+  },
+  {
+   "say": "Good news is every bad one is telling you something. Cut it open, look at the inside, and work backwards like a little detective.",
+   "truth": 10,
+   "kind": "on"
+  },
+  {
+   "say": "Sorry, let me check my card, I wrote these down so I wouldn't forget. Um.",
+   "truth": 10,
+   "kind": "filler"
+  },
+  {
+   "say": "So, okay, the first one.",
+   "truth": 11,
+   "kind": "transition",
+   "accept": [
+    10
+   ]
+  },
+  {
+   "say": "Most common, you slice in and the inside is heavy and damp and kind of rubbery, tiny tight holes, like it's raw in the middle even though it's cooked.",
+   "truth": 11,
+   "kind": "on"
+  },
+  {
+   "say": "Usually the jar wasn't lively enough, or the counter rise got cut short, or, so common, you cut it while it was hot. Let it cool an hour. I know. Torture.",
+   "truth": 11,
+   "kind": "on"
+  },
+  {
+   "say": "The other heartbreak is when you tip it out of the basket and it oozes sideways into a pancake. No height at all, and that pretty slash just disappears.",
+   "truth": 12,
+   "kind": "on"
+  },
+  {
+   "say": "Usually it rose too long and ran out of strength, or it wasn't tight enough when you rolled it up. Shorter wait, tighter tuck. And that's it, go make some ugly ones and eat them anyway.",
+   "truth": 12,
+   "kind": "on"
+  }
+ ]
+}

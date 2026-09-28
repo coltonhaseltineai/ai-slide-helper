@@ -58,6 +58,13 @@ jobs:
       - name: Show signature
         run: codesign -dr - "build/Live Outline.app" 2>&1 | tail -2
 
+      - name: Self-test (macOS 26)
+        run: |
+          OUT="$("build/Live Outline.app/Contents/MacOS/LiveOutline" --self-test)"
+          echo "$OUT"
+          echo "$OUT" | grep -q '"ok":true'
+          echo "$OUT" | grep -q '"talks":10'
+
       - name: Zip app
         run: cd build && ditto -c -k --keepParent "Live Outline.app" LiveOutline.zip
 
@@ -65,6 +72,32 @@ jobs:
         with:
           name: LiveOutline-mac
           path: mac/build/LiveOutline.zip
+
+  # Proves the app still opens on macOS 15 (Apple's on-device model framework doesn't exist there), then publishes.
+  release:
+    needs: build
+    runs-on: macos-15
+    env:
+      HAS_SIGNING: ${{ secrets.MAC_SIGNING_P12 != '' }}
+      HAS_UPDATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY != '' }}
+    defaults:
+      run:
+        working-directory: mac
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: LiveOutline-mac
+          path: mac/build
+
+      - name: Self-test on macOS 15
+        run: |
+          cd build && ditto -x -k LiveOutline.zip . && cd ..
+          OUT="$("build/Live Outline.app/Contents/MacOS/LiveOutline" --self-test)"
+          echo "$OUT"
+          echo "$OUT" | grep -q '"ok":true'
+          echo "$OUT" | grep -q '"onDevice":"needsMacOS26"'
 
       # Every push publishes a release; installed apps find it through appcast.xml.
       - name: Publish update

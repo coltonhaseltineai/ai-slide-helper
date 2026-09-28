@@ -1,0 +1,214 @@
+{
+ "schema": "live-outline-talk/1",
+ "id": "quarterly",
+ "title": "Q3 Business Review",
+ "tier": "natural",
+ "speaker": {
+  "persona": "Friendly team lead at a small scheduling-software company who wanders off script and tells stories",
+  "wpm": 160
+ },
+ "outlineText": "Q3 review: how the quarter went\nRevenue\n  New customer bookings vs target\n  Expansion from existing accounts\nChurn\n  Accounts we lost and why\n  Net revenue retention [cues: NRR]\nHiring\n  Onboarding the new folks\nProduct launches [cues: scheduling, mobile app]\nRisks\n  Harbor Foods renewal\nNext quarter goals",
+ "confusable": [
+  [
+   2,
+   3
+  ],
+  [
+   5,
+   6
+  ],
+  [
+   3,
+   6
+  ],
+  [
+   5,
+   11
+  ],
+  [
+   7,
+   8
+  ]
+ ],
+ "segments": [
+  {
+   "say": "Okay, hi everyone, thanks for jumping on. So this is the, uh, the look back at the last three months, and honestly if I had to sum it up in one word it'd be, like, busy? Good busy, mostly. Some bumps, but good.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "Like, we hit most of what we promised, a couple things slipped, and I'll be straight with you about both. I'll try to keep it quick, but, you know, me and quick, we'll see.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "Alright, so, um, let's just dive in.",
+   "truth": 1,
+   "kind": "transition",
+   "accept": [
+    0
+   ]
+  },
+  {
+   "say": "So money first, because that's what everybody actually wants to know. We closed out at about two point one million total, which is up around fourteen percent from the three months before, so yeah, that's the headline.",
+   "truth": 1,
+   "kind": "on"
+  },
+  {
+   "say": "And fun fact, I almost told you two point four, because somebody, and I'm not saying it was me, had a formula pointing at the wrong tab. Priya caught it at like eleven at night. So thank you Priya.",
+   "truth": 1,
+   "kind": "tangent"
+  },
+  {
+   "say": "Okay, so breaking that down a bit. On the brand new logo side, we signed twenty three companies that had never paid us before, and the number we set back in June was twenty, so we beat it.",
+   "truth": 2,
+   "kind": "on"
+  },
+  {
+   "say": "And that jump in signups is a big part of why support got slammed, but I'll get to the people side of that in a few minutes.",
+   "truth": 2,
+   "kind": "preview"
+  },
+  {
+   "say": "The other piece, and I think this is actually the more interesting one, is the folks who were already paying us. A bunch of them added seats or moved up to the bigger plan, and that alone added about a hundred and eighty thousand.",
+   "truth": 3,
+   "kind": "on"
+  },
+  {
+   "say": "Mostly that's the clinics, right, like one location loves it and then they roll it out to their other three offices. Nobody on sales even had to call them, it just kind of happened.",
+   "truth": 3,
+   "kind": "on"
+  },
+  {
+   "say": "Okay, so, the less fun slide. Not every customer stuck around, and overall we lost more of our base than I'd like. And honestly I think we got a little complacent about customers walking away.",
+   "truth": 4,
+   "kind": "on"
+  },
+  {
+   "say": "So nine customers cancelled this quarter. Mostly small shops, one or two people, and when we asked why, the answer was usually price, or they just never really got set up and stopped logging in after a month.",
+   "truth": 5,
+   "kind": "on"
+  },
+  {
+   "say": "Which kind of connects back to those new signups I was bragging about, because a couple of the ones that left literally signed in July. So, you know, not all growth is equal.",
+   "truth": 5,
+   "kind": "callback"
+  },
+  {
+   "say": "Um, sorry, I had the exit survey quotes on here somewhere, hang on, let me... no, that's the wrong one. Okay, forget it, I'll send them around after.",
+   "truth": 5,
+   "kind": "filler"
+  },
+  {
+   "say": "But here's the number I actually care about most. Take everybody who was a customer on July first, add what they grew by, subtract what we lost to cancellations and downgrades, and that group is paying us a hundred and eight percent of what they paid before.",
+   "truth": 6,
+   "kind": "on"
+  },
+  {
+   "say": "So like I said earlier with the clinics adding seats, that's really what's carrying the hundred and eight. The upgrades are covering for the cancellations and then some.",
+   "truth": 6,
+   "kind": "callback"
+  },
+  {
+   "say": "Anything over a hundred means the base we already have keeps growing even if we signed nobody new, so that's, that's the one I'd watch.",
+   "truth": 6,
+   "kind": "on"
+  },
+  {
+   "say": "Okay, cool, um, moving on.",
+   "truth": 7,
+   "kind": "transition",
+   "accept": [
+    6
+   ]
+  },
+  {
+   "say": "Team stuff. So we grew by three people this quarter, two engineers, Marco and Jen, and Dana, who's now leading support. And we've still got two roles open, a designer and another salesperson.",
+   "truth": 7,
+   "kind": "on"
+  },
+  {
+   "say": "Side note, Jen's final interview was over video and halfway through, her dog just walks across the keyboard and ends the call. She called back laughing, and honestly that's when I knew she'd fit in here.",
+   "truth": 7,
+   "kind": "tangent"
+  },
+  {
+   "say": "Anyway, the big thing this quarter, obviously, was actually shipping stuff. The booking calendar feature went live for everyone in August, and the phone app went into beta with about forty customers in September.",
+   "truth": 9,
+   "kind": "skip"
+  },
+  {
+   "say": "The calendar thing is already used by like sixty percent of active accounts, way faster than we expected, and the beta folks mostly want notifications and a dark mode, which, fair.",
+   "truth": 9,
+   "kind": "on"
+  },
+  {
+   "say": "And the phone app is going to come back up when I talk about what we're aiming for next, so just keep that in your head.",
+   "truth": 9,
+   "kind": "preview"
+  },
+  {
+   "say": "Oh, wait, hold on, I skipped a whole thing on the people side. How we actually got the three new folks up to speed, because we tried something different this time.",
+   "truth": 8,
+   "kind": "goback"
+  },
+  {
+   "say": "So everybody got a buddy for their first month, and they each shipped a real fix in their first week. Marco had a bug fix live on day three, which I think is a record.",
+   "truth": 8,
+   "kind": "on"
+  },
+  {
+   "say": "And the feedback was it felt way less overwhelming than just, you know, here's the wiki, good luck. So we're keeping that.",
+   "truth": 8,
+   "kind": "on"
+  },
+  {
+   "say": "Okay, back to the releases for one sec. The last thing I wanted to say there is we did all of it without a single major outage, so shout out to the platform team.",
+   "truth": 9,
+   "kind": "resume"
+  },
+  {
+   "say": "Alright, so, what could go wrong. A few things honestly keep me up at night. Our biggest competitor just cut their prices by like twenty percent, and we're still pretty dependent on a handful of big accounts.",
+   "truth": 10,
+   "kind": "on"
+  },
+  {
+   "say": "Speaking of keeping me up at night, my youngest has decided that four thirty is a great time to start the day, so if I seem a little slow today, that's why. Anyway.",
+   "truth": 10,
+   "kind": "tangent"
+  },
+  {
+   "say": "The one I really want on everyone's radar is our biggest grocery customer. Their contract is up in November, they're about eleven percent of what we bring in, and their new operations director keeps asking pointed questions about pricing.",
+   "truth": 11,
+   "kind": "on"
+  },
+  {
+   "say": "We've got a check-in with them in two weeks and I want the account team and product both in the room, because if Harbor walks, that's a real hole.",
+   "truth": 11,
+   "kind": "on"
+  },
+  {
+   "say": "Um, was there anything else on this... let me just scroll down, hang on. Nope, okay, that's it for that part.",
+   "truth": 11,
+   "kind": "filler"
+  },
+  {
+   "say": "Okay, so, last bit, and then I'll let you go.",
+   "truth": 12,
+   "kind": "transition",
+   "accept": [
+    11
+   ]
+  },
+  {
+   "say": "For October through December I want three things. Get the phone app out of beta and into everybody's hands by mid November, get cancellations down to five or fewer, and sign twenty five new customers.",
+   "truth": 12,
+   "kind": "on"
+  },
+  {
+   "say": "And keep Harbor, obviously, that's kind of goal zero. If we do those, I think we end the year in a really good spot. Okay, that's me. Questions?",
+   "truth": 12,
+   "kind": "on"
+  }
+ ]
+}

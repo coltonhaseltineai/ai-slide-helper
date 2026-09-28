@@ -1,0 +1,225 @@
+{
+ "schema": "live-outline-talk/1",
+ "id": "stoicism",
+ "title": "Stoic Tricks for Everyday Life",
+ "tier": "paraphrased",
+ "speaker": {
+  "persona": "Middle school history teacher who got into the Stoics after a rough year; self-deprecating, rambling, full of stories about his kids and his commute",
+  "wpm": 155
+ },
+ "outlineText": "Welcome and what Stoicism is\nThe dichotomy of control\n  Our judgments and choices\n  Accepting what we can't change\nNegative visualization\nThe view from above\nEvening journaling [cues: Seneca, notebook]\nHandling anger\n  Pause before reacting\n  Assume good intent\nVirtue is the whole point\nQuestions",
+ "confusable": [
+  [
+   2,
+   3
+  ],
+  [
+   5,
+   6
+  ],
+  [
+   8,
+   9
+  ],
+  [
+   3,
+   4
+  ]
+ ],
+ "segments": [
+  {
+   "say": "Hi everybody, thanks for coming. I'm Mark, I teach seventh grade history, and after a rotten year a friend handed me this little paperback of old Stoic writings, and, uh, it kind of rewired me.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "Quick background, it's a school of thought from ancient Greece and Rome, named after a painted porch where Zeno taught. And no, it's not about being a robot with no feelings.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "Also, sorry, whoever parked the blue minivan across the fire lane, the custodian is, um, not thrilled. Okay.",
+   "truth": 0,
+   "kind": "tangent"
+  },
+  {
+   "say": "Alright. So. Um, let's just, let's get into it.",
+   "truth": 1,
+   "kind": "transition",
+   "accept": [
+    0
+   ]
+  },
+  {
+   "say": "So the big idea is, you sort everything in your life into two piles, stuff that's up to you and stuff that isn't. That's from Epictetus, who was born a slave, by the way. Most of our misery comes from mixing up the piles.",
+   "truth": 1,
+   "kind": "on"
+  },
+  {
+   "say": "And I know some of you came for the losing your temper part, we'll get there, I've got plenty of personal material.",
+   "truth": 1,
+   "kind": "preview"
+  },
+  {
+   "say": "Your own opinions, what you make of stuff, what you decide to do next, that's your pile, and it's a short list. How hard you try, too. Nobody else gets a vote.",
+   "truth": 2,
+   "kind": "on"
+  },
+  {
+   "say": "Epictetus says, you can chain up my leg, but not even Zeus can touch my will. Great comeback. The inside of your head is fully yours.",
+   "truth": 2,
+   "kind": "on"
+  },
+  {
+   "say": "Um, sorry, hang on, these cards were in order when I left the house. Okay, here we go.",
+   "truth": 2,
+   "kind": "filler"
+  },
+  {
+   "say": "And everything outside that pile, you just have to make peace with. The weather, the traffic, what your boss thinks of you, the past. Quit wrestling with it and roll with it.",
+   "truth": 3,
+   "kind": "on"
+  },
+  {
+   "say": "Totally random, but my brother-in-law got into competitive barbecue, with trophies, and I'm tasting brisket for him Saturday. Anyway.",
+   "truth": 3,
+   "kind": "tangent"
+  },
+  {
+   "say": "There's this old image of a dog tied to a cart. The cart's going where it's going. The dog can trot along happily or dig its heels in and get dragged. Same destination either way. Be the trotting dog.",
+   "truth": 3,
+   "kind": "on"
+  },
+  {
+   "say": "Okay, so picture yourself floating way up, past the clouds, past the planes, looking down at your little town and your little problem. My favorite one.",
+   "truth": 5,
+   "kind": "skip"
+  },
+  {
+   "say": "Marcus Aurelius did this constantly. He'd picture all the cities and armies and weddings and funerals at once, and from that height it all just gets tiny. Your inbox is not a big deal from orbit.",
+   "truth": 5,
+   "kind": "on"
+  },
+  {
+   "say": "Which ties back to those two piles from earlier, from up there it's obvious how little of the world was ever yours to steer.",
+   "truth": 5,
+   "kind": "callback"
+  },
+  {
+   "say": "Oh wait, shoot, I skipped the gloomy one, the one where you imagine the worst. That was supposed to come first. Let me back up.",
+   "truth": 4,
+   "kind": "goback"
+  },
+  {
+   "say": "So this one's from Seneca, and it sounds grim. Every so often you deliberately picture losing stuff. Your job, your health, the people you love. Not to wallow, but so it's not an ambush, and you notice what you've got.",
+   "truth": 4,
+   "kind": "on"
+  },
+  {
+   "say": "Honestly, when I tuck my kids in and think, someday this is the last time, it makes me way more grateful and way less grumpy about the dishes.",
+   "truth": 4,
+   "kind": "on"
+  },
+  {
+   "say": "Okay, back up into orbit, where I was. What I love about that zoomed out trick is it shrinks whatever I'm stewing on down to, like, a grain of sand.",
+   "truth": 5,
+   "kind": "resume"
+  },
+  {
+   "say": "Um, how am I doing on time? Five minutes? Okay, I'll talk faster, my students say I take the scenic route.",
+   "truth": 5,
+   "kind": "filler"
+  },
+  {
+   "say": "Next one's a bedtime habit with a pen. Once the house went quiet, one of these old Romans would go back over his whole day, like he was on trial. Where did I blow it, what did I do right, what would I do differently. Game film for your personality.",
+   "truth": 6,
+   "kind": "on"
+  },
+  {
+   "say": "And that's different from the floating up in space thing. That one shrinks stuff, this is more like going through your receipts.",
+   "truth": 6,
+   "kind": "callback"
+  },
+  {
+   "say": "And spoiler, what shows up most when I do this is me losing my cool, but that's its own section, we'll get there.",
+   "truth": 6,
+   "kind": "preview"
+  },
+  {
+   "say": "Anyway, I use a cheap spiral pad from the drugstore, three lines, lights out. And fun fact, Marcus's Meditations was basically his private diary, never meant to be read.",
+   "truth": 6,
+   "kind": "on"
+  },
+  {
+   "say": "Okay. Um. So. Yeah, moving right along.",
+   "truth": 7,
+   "kind": "transition",
+   "accept": [
+    6
+   ]
+  },
+  {
+   "say": "So, rage. Seneca wrote a whole book on it. He passes along that old line that it's a brief madness, the passion that wrecks friendships and cities, and half the book is tips for taming it.",
+   "truth": 7,
+   "kind": "on"
+  },
+  {
+   "say": "Side note, whoever brought the lemon bars on the back table, you're a hero, I've had three and I'm not stopping.",
+   "truth": 7,
+   "kind": "tangent"
+  },
+  {
+   "say": "Tip number one, just wait. It's so simple it's annoying. Something hits you, and you put a gap between that and whatever you do. Seneca said the greatest cure for rage is delay.",
+   "truth": 8,
+   "kind": "on"
+  },
+  {
+   "say": "Last month a guy cut me off on the highway, my hand's going for the horn, and I said out loud, hold on, and breathed. By the time I'd counted to ten I didn't even care.",
+   "truth": 8,
+   "kind": "on"
+  },
+  {
+   "say": "Tip two is how you read the other person. Epictetus says everything has two handles, one you can carry it by and one you can't. Maybe that guy was rushing to the hospital. Give him the charitable version.",
+   "truth": 9,
+   "kind": "on"
+  },
+  {
+   "say": "Which is those two piles again, right? What the guy in the other car was thinking isn't yours. How you read him is.",
+   "truth": 9,
+   "kind": "callback"
+  },
+  {
+   "say": "Um, sorry, where was I. Oh, my notes are upside down, that explains a lot.",
+   "truth": 9,
+   "kind": "filler"
+  },
+  {
+   "say": "So here's what ties it all together. For the Stoics, money, fame, even health are nice to have, but they don't make a life go well. What counts is character. Being wise, brave, fair, and self-restrained.",
+   "truth": 10,
+   "kind": "on"
+  },
+  {
+   "say": "And I'll leave time at the end for you to grill me, so start thinking up the hard stuff.",
+   "truth": 10,
+   "kind": "preview"
+  },
+  {
+   "say": "Anyway, every trick tonight is basically gym equipment for building character. The goal isn't calm for its own sake, it's being a decent, brave person no matter what hand you're dealt.",
+   "truth": 10,
+   "kind": "on"
+  },
+  {
+   "say": "So, yeah. That's, um, that's pretty much it from me.",
+   "truth": 11,
+   "kind": "transition",
+   "accept": [
+    10
+   ]
+  },
+  {
+   "say": "Okay, hands up, what've you got? Push back, tell me I'm wrong, ask about the reading list. Yes, you in the green sweater, go ahead.",
+   "truth": 11,
+   "kind": "on"
+  }
+ ]
+}

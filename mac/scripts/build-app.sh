@@ -28,6 +28,16 @@ if ! otool -l "$APP/Contents/MacOS/LiveOutline" | grep -q "@executable_path/../F
   install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/MacOS/LiveOutline"
 fi
 
+# Files the app reads at run time: the judge prompt (same as the server's), the tuned tiny-model settings,
+# and the benchmark talks with Claude's recorded results for Help → Compare Judges.
+RES="$APP/Contents/Resources"
+cp ../api/_judge-prompt.json "$RES/judge-prompt.json"
+cp ../eval/profiles.json ../eval/splits.json ../eval/results/claude-reference.json "$RES/"
+mkdir -p "$RES/talks" && cp ../eval/built/*.json "$RES/talks/"
+
+# Apple's on-device model framework must be weak-linked, or the app won't open on macOS 14/15.
+./scripts/check-weak-link.sh "$APP/Contents/MacOS/LiveOutline"
+
 # Turn the 1024px PNG into an .icns icon.
 ICONSET="build/AppIcon.iconset"
 rm -rf "$ICONSET" && mkdir -p "$ICONSET"

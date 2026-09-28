@@ -35,16 +35,31 @@ function loadTalks(split, only) {
 let judgeLib = null;
 const vcacheFile = path.join(CACHE, 'verdicts.jsonl');
 const vcache = new Map();
+const usedKeys = new Set();   // cached answers this run actually used
+const missSeen = new Set();
+// Median API latency measured for each model (used for answers produced without the API).
+const SIM_MS = { haiku: 800, sonnet: 1590 };
 function loadVerdictCache() {
   if (!fs.existsSync(vcacheFile)) return;
   for (const l of fs.readFileSync(vcacheFile, 'utf8').split('\n')) if (l) { const o = JSON.parse(l); vcache.set(o.k, o.v); }
 }
-async function claudeJudge(model, input, variant) {
+async function claudeJudge(model, input, variant, guess) {
   if (!judgeLib) judgeLib = require('../api/_judge');
   const { render } = require('../api/_judge-render');
   const r = render(input, variant);
   const k = crypto.createHash('sha1').update([model, r.promptVersion, r.rules, r.prompt].join('\u0000')).digest('hex');
-  if (vcache.has(k)) return vcache.get(k);
+  if (vcache.has(k)) { usedKeys.add(k); return vcache.get(k); }
+  // Subscription mode (EVAL_JUDGE=cache): no API calls. Unanswered questions are written to
+  // .cache/misses.jsonl for Claude subagents to answer (eval/tools/misses.js), then the run is repeated.
+  if (process.env.EVAL_JUDGE === 'cache') {
+    if (!missSeen.has(k)) {
+      missSeen.add(k);
+      fs.appendFileSync(path.join(CACHE, 'misses.jsonl'), JSON.stringify({ k, model, rules: r.rules, prompt: r.prompt, visible: r.visible, current: input.current }) + '\n');
+    }
+    // Carry on as if the answer were the guess (from the ground truth), so the next questions asked are the
+    // ones the real answers will most likely lead to; the run is repeated until nothing is missing.
+    return { ...(guess || { state: 'unclear', point: input.current, confidence: 'low' }), ms: SIM_MS[model], miss: true };
+  }
   let last;
   for (let attempt = 0; attempt < 4; attempt++) {
     try {
@@ -59,9 +74,29 @@ async function claudeJudge(model, input, variant) {
   return { state: 'unclear', point: input.current, confidence: 'low', ms: 0, error: String(last && last.message) };
 }
 
+// Subscription mode's stand-in for an unanswered question: what a perfect judge would say at time t.
+function speculate(talk, t, input) {
+  const ok = acceptableAt(talk, t);
+  return ok.includes(input.current) ? { state: 'same', point: input.current, confidence: 'high' } : { state: 'moved', point: ok[0], confidence: 'high' };
+}
+
 async function prepFor(talk) {
-  const f = path.join(CACHE, `prep-${talk.id}.json`);
+  // Keyed by the outline and prep rules, so edited talks never reuse a stale prep.
+  const { renderPrep } = require('../api/_judge-render');
+  const r = renderPrep(talk.items);
+  const key = crypto.createHash('sha1').update(r.rules + '\n' + r.prompt).digest('hex').slice(0, 12);
+  const f = path.join(CACHE, `prep-${talk.id}-${key}.json`);
   if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, 'utf8'));
+  if (process.env.EVAL_JUDGE === 'cache') {
+    // Subscription mode: record the request; eval/tools/misses.js prep-batches hands it to Claude.
+    fs.mkdirSync(CACHE, { recursive: true });
+    const missFile = path.join(CACHE, 'prep-misses.jsonl');
+    const seen = fs.existsSync(missFile) ? fs.readFileSync(missFile, 'utf8') : '';
+    if (!seen.includes(`"${talk.id}-${key}"`)) {
+      fs.appendFileSync(missFile, JSON.stringify({ k: `${talk.id}-${key}`, file: path.basename(f), count: talk.items.length, rules: r.rules, prompt: r.prompt }) + '\n');
+    }
+    return null;
+  }
   if (!judgeLib) judgeLib = require('../api/_judge');
   const out = await judgeLib.prep(talk.items, { model: 'sonnet' });
   fs.writeFileSync(f, JSON.stringify(out.points));
@@ -149,7 +184,7 @@ async function runJudge(talk, { ask, cadence, policy = POLICY.live, statusQuo = 
     if (tiny) {
       const st = tiny.stateAt(ci);
       tinyVerdict = tiny.tracker.verdict(f.current, st);
-      apply(f.verdict(tinyVerdict, { seq: ++tinySeq, askedAt: c.t, askedCurrent: f.current, at: c.t + tiny.ms / 1000, source: 'tiny' }), c.t);
+      apply(f.verdict(tinyVerdict, { seq: ++tinySeq, askedAt: c.t, askedCurrent: f.current, at: c.t, source: 'tiny' }), c.t);
     }
     if (!ask) continue;
     // Ask on the cadence; in hybrid mode only when the tiny model is unsure.
@@ -159,7 +194,7 @@ async function runJudge(talk, { ask, cadence, policy = POLICY.live, statusQuo = 
       : wantsHelp && shouldJudge({ now: c.t, lastAskAt, lastWordAt, newWords, inFlight: !!inFlight }, cadence);
     if (!due) continue;
     const input = { items: talk.items, current: f.current, lines: speechLines(talk.chunks, c.t) };
-    const v = await ask(input);
+    const v = await ask(input, c.t);
     calls++;
     if (v.error) errors.push(v.error);
     const latency = Math.min(v.ms / 1000, cadence.timeout);
@@ -265,8 +300,14 @@ async function main() {
   const needsPrep = contenders.some(c => c.includes(':prep'));
   const preps = {};
   if (needsPrep) for (const t of talks) preps[t.id] = await prepFor(t);
+  const missingPrep = talks.filter(t => needsPrep && !preps[t.id]).map(t => t.id);
+  if (missingPrep.length) {
+    console.log(`prep missing for ${missingPrep.join(', ')} (see .cache/prep-misses.jsonl) — skipping :prep contenders this run.`);
+    contenders.splice(0, contenders.length, ...contenders.filter(c => !c.includes(':prep')));
+  }
   const scorerCache = new Map();
   const rows = [];
+  const reference = {};
   for (const name of contenders) {
     const [kind, model, anchors, judgeModel] = name.split(':');
     const per = await Promise.all(talks.map(async talk => {
@@ -278,23 +319,44 @@ async function main() {
         for (const s of talk.truth) if (![s.index, ...s.accept].includes(cur)) { cur = s.index; moves.push({ t: s.start, to: cur }); }
         r = { moves, calls: 0 };
       } else if (kind === 'haiku' || kind === 'sonnet') {
-        r = await runJudge(talk, { cadence: CADENCE.claude, ask: input => claudeJudge(kind, input, variant) });
+        // Optional experiment knobs: --min-gap S, --medium-now (medium next-point moves need no second vote).
+        const cadence = { ...CADENCE.claude, minGap: +flag('min-gap', CADENCE.claude.minGap), minNewWords: +flag('min-words', CADENCE.claude.minNewWords) };
+        const policy = flag('medium-now', false) ? { ...POLICY.live, mediumAgreeWithin: 1e9, mediumNow: true } : POLICY.live;
+        r = await runJudge(talk, { cadence, policy, ask: (input, t) => claudeJudge(kind, input, variant, speculate(talk, t, input)) });
       } else if (kind === 'statusquo') {
-        r = await runJudge(talk, { cadence: { ...CADENCE.claude, timeout: 30 }, policy: POLICY.statusQuo, statusQuo: true, ask: input => claudeJudge('haiku', input, variant) });
+        r = await runJudge(talk, { cadence: { ...CADENCE.claude, timeout: 30 }, policy: POLICY.statusQuo, statusQuo: true, ask: (input, t) => claudeJudge('haiku', input, variant, speculate(talk, t, input)) });
       } else if (kind === 'tiny') {
         const tiny = tinyRunner(talk, model, anchors || 'bare', preps[talk.id], profiles[`${model}:${anchors || 'bare'}`] || DEFAULT_PROFILE, scorerCache);
         r = await runJudge(talk, { cadence: CADENCE.onDevice, tiny });
       } else if (kind === 'hybrid') {
         const tiny = tinyRunner(talk, model, anchors || 'prep', preps[talk.id], profiles[`${model}:${anchors || 'prep'}`] || DEFAULT_PROFILE, scorerCache);
         const jm = judgeModel || 'haiku';
-        r = await runJudge(talk, { cadence: { ...CADENCE.onDevice, minGap: 3, timeout: 4 }, tiny, ask: input => claudeJudge(jm, input, variant) });
+        r = await runJudge(talk, { cadence: { ...CADENCE.onDevice, minGap: 3, timeout: 4 }, tiny, ask: (input, t) => claudeJudge(jm, input, variant, speculate(talk, t, input)) });
       } else throw new Error(`unknown contender ${name}`);
       return { talk: talk.id, ...r, score: scoreTimeline(talk, r.moves) };
     }));
+    if (['haiku', 'sonnet'].includes(name)) reference[name] = Object.fromEntries(per.map(p => [p.talk, {
+      moves: p.moves.map(m => ({ t: +m.t.toFixed(2), to: m.to })), calls: p.calls,
+      latencies: (p.latencies || []).map(x => +x.toFixed(2)), errors: (p.errors || []).length,
+    }]));
     const row = summarize(name, per);
     row.perTalk = Object.fromEntries(per.map(p => [p.talk, +(100 * p.score.onCorrect).toFixed(0)]));
     rows.push(row);
     console.log(JSON.stringify(row));
+  }
+  if (missSeen.size) console.log(`\n${missSeen.size} judge questions still need answers (see .cache/misses.jsonl) — results above are incomplete.`);
+  // --reference: record Claude's moves per talk for the Mac app's Compare Judges window (re-scored there).
+  if (flag('reference', false)) {
+    if (missSeen.size || split !== 'all') throw new Error('--reference needs --split all and no missing answers');
+    const sources = [...usedKeys].map(k => vcache.get(k)).filter(Boolean).reduce((a, v) => { a[v.source || 'api'] = (a[v.source || 'api'] || 0) + 1; return a; }, {});
+    const out = {
+      note: 'Claude judge answers on the benchmark talks, replayed in closed loop. Answers came from the Claude API and, ' +
+        'after its credits ran out, from Claude subagents on a subscription; answer times are the API medians measured earlier ' +
+        '(Haiku 0.8 s, Sonnet 1.59 s). Moves are re-scored by the app.',
+      promptVersion: require('../api/_judge-prompt.json').current, answers: sources, contenders: reference,
+    };
+    fs.writeFileSync(path.join(EVAL, 'results', 'claude-reference.json'), JSON.stringify(out));
+    console.log('wrote results/claude-reference.json');
   }
   fs.mkdirSync(path.join(EVAL, 'results'), { recursive: true });
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');

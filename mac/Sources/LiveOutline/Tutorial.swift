@@ -7,7 +7,7 @@ import MatcherCore
 // New users see every page; people who update see only pages newer than the last tutorial they saw.
 
 struct TutorialPage: Identifiable {
-    enum Demo { case welcome, outline, follow, correct, smart, learned, updates, shortcuts }
+    enum Demo { case welcome, outline, follow, meaning, correct, compare, updates, shortcuts }
 
     let id: String
     let addedIn: Int
@@ -28,18 +28,18 @@ enum Tutorial {
         TutorialPage(id: "follow", addedIn: 1, symbol: "waveform", title: "Present and just talk",
                      body: "Click Present, then press Space to start listening. The point you're on turns bold and the highlight glides along with you.",
                      demo: .follow),
+        TutorialPage(id: "meaning", addedIn: 14, symbol: "sparkles", title: "It follows what you mean",
+                     body: "Say it your own way. Apple's on-device model (or a tiny meaning model on older Macs) works out which point you're on from what you mean, right on your Mac, for free. Side stories and \"like I said earlier\" don't move the highlight.",
+                     demo: .meaning),
         TutorialPage(id: "correct", addedIn: 1, symbol: "arrow.left.arrow.right", title: "Nudge it when it's wrong",
-                     body: "Press ← or → (or click a line) to move the highlight yourself. Listening carries on from there, and it learns from the correction.",
+                     body: "Press ← or → (or click a line) to move the highlight yourself. You always win, and listening carries on from there.",
                      demo: .correct),
-        TutorialPage(id: "smart", addedIn: 8, symbol: "brain.head.profile", title: "Say it your own way",
-                     body: "You don't have to read your outline word for word. When the app is unsure, Claude works out which point you're on from what you actually said.",
-                     demo: .smart),
-        TutorialPage(id: "learned", addedIn: 13, symbol: "tag", title: "It learns how you talk",
-                     body: "Words you use for each point are saved, so next time the app recognises them instantly. In Edit mode they appear as tags: remove wrong ones with ✕, or add your own with +.",
-                     demo: .learned),
         TutorialPage(id: "updates", addedIn: 12, symbol: "arrow.down.circle", title: "Always up to date",
                      body: "Live Outline checks for new versions every day. When one is ready, click Install Update and it relaunches with the new features.",
                      demo: .updates),
+        TutorialPage(id: "compare", addedIn: 14, symbol: "flag.checkered", title: "Race the judges",
+                     body: "Curious how well your Mac keeps up? Help → Compare Judges plays practice talks through Apple's model, the tiny model and Claude, and shows who stays on the right point and how fast.",
+                     demo: .compare),
         TutorialPage(id: "shortcuts", addedIn: 1, symbol: "keyboard", title: "Handy shortcuts",
                      body: "You can reopen this tutorial any time from the Help menu.",
                      demo: .shortcuts),
@@ -162,22 +162,19 @@ private struct TutorialDemo: View {
             ])
         case .correct:
             MiniOutlineDemo(lines: Self.lines, frames: [
-                .init(transcript: "…the brain files away what you learned", active: 1, hold: 1.8),
-                .init(transcript: "…the brain files away what you learned", active: 1, key: "→", hold: 0.7),
-                .init(transcript: "…the brain files away what you learned", active: 2, badge: "Learned: files away", hold: 2.4),
+                .init(transcript: "…the brain files away your day while you sleep", active: 1, hold: 1.8),
+                .init(transcript: "…the brain files away your day while you sleep", active: 1, key: "→", hold: 0.7),
+                .init(transcript: "…the brain files away your day while you sleep", active: 2, hold: 2.4),
             ])
-        case .smart:
+        case .meaning:
             MiniOutlineDemo(lines: Self.lines, frames: [
-                .init(transcript: "…so honestly, put the phone down an hour before bed", active: 3, hold: 1.8),
-                .init(transcript: "…so honestly, put the phone down an hour before bed", active: 3, badge: "Asking Claude…", hold: 1.2),
-                .init(transcript: "…so honestly, put the phone down an hour before bed", active: 4, badge: "Learned: phone down", hold: 2.6),
+                .init(transcript: "…honestly, my phone sleeps in the kitchen now", active: 3, hold: 1.6),
+                .init(transcript: "…honestly, my phone sleeps in the kitchen now", active: 3, badge: "Thinking…", hold: 0.8),
+                .init(transcript: "…honestly, my phone sleeps in the kitchen now", active: 4, badge: "On your Mac", hold: 2.0),
+                .init(transcript: "…funny story, my dog once ate a charger", active: 4, badge: "Just an aside", hold: 2.4),
             ])
-        case .learned:
-            MiniOutlineDemo(lines: Self.lines, frames: [
-                .init(transcript: "Edit mode", active: 4, tags: ["blue light", "phone down", "pizza", "pillow"], hold: 1.8),
-                .init(transcript: "Remove the wrong one with ✕", active: 4, tags: ["blue light", "phone down", "pillow"], hold: 1.6),
-                .init(transcript: "…or teach your own with +", active: 4, tags: ["blue light", "phone down", "pillow", "scrolling"], hold: 2.2),
-            ])
+        case .compare:
+            RaceDemo()
         case .updates:
             UpdateDemo()
         case .shortcuts:
@@ -191,7 +188,6 @@ private struct DemoFrame {
     var active = 0
     var badge: String?
     var key: String?
-    var tags: [String] = []
     var hold: Double = 1.7
 }
 
@@ -208,37 +204,23 @@ private struct MiniOutlineDemo: View {
             VStack(alignment: .leading, spacing: 1) {
                 ForEach(lines.indices, id: \.self) { i in
                     let sub = lines[i].hasPrefix("  ")
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(lines[i].trimmingCharacters(in: .whitespaces))
-                            .font(.system(size: sub ? 12 : 13.5, weight: i == f.active ? .bold : (sub ? .regular : .medium)))
-                            .foregroundStyle(i < f.active ? Color.secondary : Color.primary)
-                        if i == f.active, !f.tags.isEmpty {
-                            HStack(spacing: 4) {
-                                ForEach(f.tags, id: \.self) { tag in
-                                    Text(tag)
-                                        .font(.system(size: 9.5))
-                                        .foregroundStyle(Color.accentColor)
-                                        .padding(.horizontal, 6).padding(.vertical, 1)
-                                        .background(Color.accentColor.opacity(0.12), in: Capsule())
-                                        .transition(.scale.combined(with: .opacity))
-                                }
+                    Text(lines[i].trimmingCharacters(in: .whitespaces))
+                        .font(.system(size: sub ? 12 : 13.5, weight: i == f.active ? .bold : (sub ? .regular : .medium)))
+                        .foregroundStyle(i < f.active ? Color.secondary : Color.primary)
+                        .padding(.vertical, 3.5)
+                        .padding(.leading, sub ? 22 : 10)
+                        .padding(.trailing, 10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background {
+                            if i == f.active {
+                                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                                    .fill(Color.accentColor.opacity(0.16))
+                                    .overlay(alignment: .leading) {
+                                        Capsule().fill(Color.accentColor).frame(width: 3).padding(.vertical, 5)
+                                    }
+                                    .matchedGeometryEffect(id: "highlight", in: ns)
                             }
                         }
-                    }
-                    .padding(.vertical, 3.5)
-                    .padding(.leading, sub ? 22 : 10)
-                    .padding(.trailing, 10)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background {
-                        if i == f.active {
-                            RoundedRectangle(cornerRadius: 7, style: .continuous)
-                                .fill(Color.accentColor.opacity(0.16))
-                                .overlay(alignment: .leading) {
-                                    Capsule().fill(Color.accentColor).frame(width: 3).padding(.vertical, 5)
-                                }
-                                .matchedGeometryEffect(id: "highlight", in: ns)
-                        }
-                    }
                 }
             }
             .padding(.horizontal, 12)
@@ -260,7 +242,7 @@ private struct MiniOutlineDemo: View {
                     KeyCap(key).transition(.scale.combined(with: .opacity))
                 }
                 if let badge = f.badge {
-                    Label(badge, systemImage: "brain")
+                    Label(badge, systemImage: "sparkles")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.accentColor)
                         .padding(.horizontal, 8).padding(.vertical, 3)
@@ -367,7 +349,7 @@ private struct UpdateDemo: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("A new version of Live Outline is available!")
                     .font(.system(size: 13, weight: .semibold))
-                Text("It learns faster and has a new tutorial.")
+                Text("It follows what you mean, right on your Mac.")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
                 HStack {
@@ -390,6 +372,51 @@ private struct UpdateDemo: View {
                 withAnimation(.easeInOut(duration: 0.15)) { pressed = true }
                 try? await Task.sleep(for: .seconds(0.2))
                 withAnimation(.easeInOut(duration: 0.15)) { pressed = false }
+            }
+        }
+    }
+}
+
+/// Three lanes racing: who stays on the right point, and how fast.
+private struct RaceDemo: View {
+    private let lanes: [(name: String, symbol: String, share: Double)] = [
+        ("On your Mac", "cpu", 0.86), ("Tiny model", "sparkles", 0.7), ("Claude", "cloud", 0.9),
+    ]
+    @State private var go = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            ForEach(lanes, id: \.name) { lane in
+                HStack(spacing: 10) {
+                    Label(lane.name, systemImage: lane.symbol)
+                        .font(.system(size: 12, weight: .semibold))
+                        .frame(width: 110, alignment: .leading)
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule().fill(Color.secondary.opacity(0.15))
+                            Capsule().fill(Color.accentColor.gradient)
+                                .frame(width: geo.size.width * (go ? lane.share : 0.04))
+                        }
+                    }
+                    .frame(height: 12)
+                }
+            }
+            HStack {
+                Spacer()
+                Text("Copy Results as JSON")
+                    .font(.system(size: 11, weight: .semibold))
+                    .padding(.horizontal, 10).padding(.vertical, 4)
+                    .background(.regularMaterial, in: Capsule())
+                    .opacity(go ? 1 : 0)
+            }
+        }
+        .padding(24)
+        .task {
+            while !Task.isCancelled {
+                withAnimation(.easeOut(duration: 1.8)) { go = true }
+                try? await Task.sleep(for: .seconds(3.4))
+                withAnimation(.easeIn(duration: 0.3)) { go = false }
+                try? await Task.sleep(for: .seconds(0.6))
             }
         }
     }

@@ -1,0 +1,213 @@
+{
+ "schema": "live-outline-talk/1",
+ "id": "money",
+ "title": "Adulting With Cash: Personal Finance for Your Twenties",
+ "tier": "paraphrased",
+ "speaker": {
+  "persona": "Community college financial aid counselor running a free Saturday workshop; jokey, digressive, full of personal stories",
+  "wpm": 160
+ },
+ "outlineText": "Welcome and why money matters\nBudgeting\n  Track every dollar\n  Needs, wants, savings split\nEmergency fund [cues: rainy day]\nPaying off debt\n  Highest interest first\nCredit scores\nInvesting basics\n  Index funds [cues: S&P 500]\nRetirement accounts\nAvoiding scams",
+ "confusable": [
+  [
+   1,
+   4
+  ],
+  [
+   8,
+   10
+  ],
+  [
+   3,
+   4
+  ]
+ ],
+ "segments": [
+  {
+   "say": "Hey everyone, uh, thanks for coming out on a Saturday, I know, the free coffee is the real draw. I'm Marcus, from the financial aid office, and today's about getting your finances sorted before they sort you.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "Honestly, nobody taught me any of this. I was twenty-two with my first real paycheck and zero clue, and the habits you pick up now set the tone for decades.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "Oh, and the bathrooms are past the vending machine, the one with the same sad bag of pretzels stuck in the coil since like twenty nineteen.",
+   "truth": 0,
+   "kind": "tangent"
+  },
+  {
+   "say": "Okay. So. Let's just, uh, dive in.",
+   "truth": 1,
+   "kind": "transition",
+   "accept": [
+    0
+   ]
+  },
+  {
+   "say": "Alright, the foundation is sitting down once a month and deciding, before the paycheck even lands, where it's going to go. You give each chunk of income a job, instead of wondering later where it went.",
+   "truth": 1,
+   "kind": "on"
+  },
+  {
+   "say": "And I know some of you came for the stock market part, we'll get there near the end, I promise.",
+   "truth": 1,
+   "kind": "preview"
+  },
+  {
+   "say": "So step one is just watching where it all leaks out. For one month, write down each coffee, each subscription, each late-night taco run. I found I was blowing ninety bucks a month on delivery fees.",
+   "truth": 2,
+   "kind": "on"
+  },
+  {
+   "say": "App, notebook, spreadsheet, whatever you'll actually keep logging in. The point isn't guilt, it's seeing the real picture of where it goes.",
+   "truth": 2,
+   "kind": "on"
+  },
+  {
+   "say": "Then a handy rule of thumb is to carve your take-home pay into three buckets. About half goes to the must-haves, rent, groceries, the electric bill, the car payment.",
+   "truth": 3,
+   "kind": "on"
+  },
+  {
+   "say": "Around thirty percent is fun stuff, concerts, sneakers you absolutely did not require, and the last twenty percent goes to your future self. If you live somewhere expensive it'll look different.",
+   "truth": 3,
+   "kind": "on"
+  },
+  {
+   "say": "Um, sorry, hang on, I had a note here about, nope, that's for later. Where was I. Right.",
+   "truth": 3,
+   "kind": "filler"
+  },
+  {
+   "say": "Okay, so before you do anything fancy, you build a cushion. Cash sitting somewhere boring and separate, only for when life punches you, like your transmission dies or you get laid off.",
+   "truth": 4,
+   "kind": "on"
+  },
+  {
+   "say": "Aim for three to six months of what it costs you to live. That sounds huge, so start with a thousand bucks. Park it in a high-yield savings account so you can't swipe it at Target by accident.",
+   "truth": 4,
+   "kind": "on"
+  },
+  {
+   "say": "And this is where writing stuff down, like I said with the taco runs, comes in handy, because you actually know what a month of living costs.",
+   "truth": 4,
+   "kind": "callback"
+  },
+  {
+   "say": "Totally random, but my roommate's parrot learned to imitate our microwave beep, so now I keep getting up for food that doesn't exist. Anyway.",
+   "truth": 4,
+   "kind": "tangent"
+  },
+  {
+   "say": "Okay, moving on, moving on.",
+   "truth": 5,
+   "kind": "transition",
+   "accept": [
+    4
+   ]
+  },
+  {
+   "say": "Now, the stuff you owe. Student loans, that card balance, the car note. The goal is to get all of it down to zero as fast as you reasonably can, because every month it sits there, it grows.",
+   "truth": 5,
+   "kind": "on"
+  },
+  {
+   "say": "Always make at least the minimum on everything, set up autopay so you never miss one, then any extra goes toward knocking those balances down.",
+   "truth": 5,
+   "kind": "on"
+  },
+  {
+   "say": "So, lenders, landlords, even some employers all look at this three-digit number that's basically your report card for borrowing. It runs about three hundred to eight fifty, and past seven hundred you're golden.",
+   "truth": 7,
+   "kind": "skip"
+  },
+  {
+   "say": "What moves it most is boring stuff, never being late, and not using much of your limit. If your card lets you spend a thousand, keep the balance under three hundred. Keep your oldest card open too.",
+   "truth": 7,
+   "kind": "on"
+  },
+  {
+   "say": "Uh, hold on, lemme check the time real quick. Okay, we're good, we're fine.",
+   "truth": 7,
+   "kind": "filler"
+  },
+  {
+   "say": "Oh wait, shoot, I skipped something back on the owing stuff. When you've got extra to throw at your balances, which one do you go after?",
+   "truth": 6,
+   "kind": "goback"
+  },
+  {
+   "say": "The math answer is, line them up by rate and attack the nastiest one, like the card charging twenty-four percent, before the student loan at five. That saves you the most.",
+   "truth": 6,
+   "kind": "on"
+  },
+  {
+   "say": "Some folks knock out the smallest balance for a quick win, which is fine if it keeps you motivated, but the cheapest route is by rate.",
+   "truth": 6,
+   "kind": "on"
+  },
+  {
+   "say": "Okay, back on track, jumping ahead to making your money grow. Once the ugly balances are gone, you want spare cash working for you instead of napping in checking.",
+   "truth": 8,
+   "kind": "resume"
+  },
+  {
+   "say": "Putting cash into the stock market means you own tiny slices of real businesses, and over decades it's historically grown around seven percent a year after inflation. Some years it drops thirty percent, which scares people.",
+   "truth": 8,
+   "kind": "on"
+  },
+  {
+   "say": "Remember that card charging twenty-four percent? This is the flip side, compounding working for you instead of against you.",
+   "truth": 8,
+   "kind": "callback"
+  },
+  {
+   "say": "And there's a special way to do this through your job with tax perks, I'll get to it in a minute, hold that thought.",
+   "truth": 8,
+   "kind": "preview"
+  },
+  {
+   "say": "Now, the easiest way to own the whole market is one thing that holds all the big companies at once. Instead of betting on one stock, you get like five hundred in a single purchase.",
+   "truth": 9,
+   "kind": "on"
+  },
+  {
+   "say": "They cost almost nothing to hold, and most fancy stock pickers don't even beat them. Warren Buffett literally left instructions that his wife's inheritance should mostly go into the boring version.",
+   "truth": 9,
+   "kind": "on"
+  },
+  {
+   "say": "Okay, the workplace plans. A lot of jobs let you stash part of each paycheck before taxes, the four oh one k, and many will match it. Say you put in five percent and they chip in five more. That's free cash, never leave it on the table.",
+   "truth": 10,
+   "kind": "on"
+  },
+  {
+   "say": "Then on your own there's the Roth, where you pay tax now while your bracket's low, and decades later pull it all out tax free when you're sixty-something and golfing.",
+   "truth": 10,
+   "kind": "on"
+  },
+  {
+   "say": "Which is why that rainy day pile we talked about matters, so you're never tempted to raid this one.",
+   "truth": 10,
+   "kind": "callback"
+  },
+  {
+   "say": "Last thing, and it's a big one. People will pretend to be someone you trust, your bank, the IRS, a relative in trouble. If anyone's demanding gift cards, crypto, or a wire right now, that's the tell.",
+   "truth": 11,
+   "kind": "on"
+  },
+  {
+   "say": "Hang up and call back using the number on your card, never the one they gave you. And if something promises huge guaranteed returns with zero risk, it's fake.",
+   "truth": 11,
+   "kind": "on"
+  },
+  {
+   "say": "Oh, and freeze your file at the three bureaus. It's free, and a crook with your social security number still can't open a card in your name. Alright, that's it, go get your coffee.",
+   "truth": 11,
+   "kind": "on"
+  }
+ ]
+}

@@ -41,32 +41,6 @@ final class MatcherTests: XCTestCase {
         XCTAssertEqual(m.current, 0)
     }
 
-    func testLearnedWordsLetParaphraseMatch() {
-        let m = Matcher(items: parseOutline(outline))
-        m.feed("welcome everyone introductions")
-        let paraphrase = ["rest is honestly the foundation", "nothing works without proper rest overnight"]
-        paraphrase.forEach { m.feed($0) }
-        XCTAssertEqual(m.current, 0)
-        m.addKeywords(1, ["rest", "foundation", "overnight"], source: .learned)
-        paraphrase.forEach { m.feed($0) }
-        XCTAssertEqual(m.current, 1)
-        XCTAssertEqual(m.hits(1, "getting more rest"), 1)
-    }
-
-    func testLibraryCapsAndRoundTrips() throws {
-        var lib = LearnedLibrary()
-        lib.cap = 3
-        lib.setHints("Why sleep matters", ["rest", "rest", "bedtime"])
-        XCTAssertEqual(lib.addLearned("Why sleep matters", ["a", "b"], now: 1), 2)
-        XCTAssertEqual(lib.addLearned("why SLEEP matters!", ["b", "c", "d"], now: 2), 2)
-        let data = try JSONEncoder().encode(lib)
-        let again = try JSONDecoder().decode(LearnedLibrary.self, from: data)
-        XCTAssertEqual(again.words("Why sleep matters").hints, ["rest", "bedtime"])
-        XCTAssertEqual(Set(again.words("Why sleep matters").learned), ["b", "c", "d"])
-        XCTAssertEqual(again.learnedCount, 3)
-        XCTAssertTrue(again.has("Why sleep matters"))
-    }
-
     func testShouldLocate() {
         XCTAssertFalse(shouldLocate(now: 20, lastCallAt: 15, lastConfidentAt: 19, newWords: 10, inFlight: false))
         XCTAssertTrue(shouldLocate(now: 20, lastCallAt: 15, lastConfidentAt: 13, newWords: 10, inFlight: false))
@@ -75,21 +49,13 @@ final class MatcherTests: XCTestCase {
         XCTAssertFalse(shouldLocate(now: 20, lastCallAt: 9, lastConfidentAt: 19, newWords: 3, inFlight: false))
     }
 
-    func testRemoveAndListLearnedWords() {
-        var lib = LearnedLibrary()
-        lib.addLearned("Immune health", ["germs"], now: 1)
-        lib.addLearned("Immune health", ["White Cells", "flu"], now: 2)
-        XCTAssertEqual(lib.learnedWords("Immune health"), ["flu", "white cells", "germs"])
-        lib.removeLearned("immune HEALTH", "White Cells")
-        XCTAssertEqual(lib.learnedWords("Immune health"), ["flu", "germs"])
-        XCTAssertEqual(lib.learnedCount, 2)
-        lib.removeLearned("Unknown line", "x")   // no-op
-    }
-
     func testTutorialPagesToShow() {
         let addedIn = [1, 1, 8, 13, 14]
         XCTAssertEqual(tutorialPagesToShow(addedIn: addedIn, lastSeen: 0), [0, 1, 2, 3, 4])   // new user: everything
         XCTAssertEqual(tutorialPagesToShow(addedIn: addedIn, lastSeen: 13), [4])              // after an update: what's new
         XCTAssertEqual(tutorialPagesToShow(addedIn: addedIn, lastSeen: 14), [])               // up to date
+        // Today's tour: someone who saw everything up to 13 gets just "meaning" and "compare".
+        let tour = [1, 1, 1, 14, 1, 12, 14, 1]
+        XCTAssertEqual(tutorialPagesToShow(addedIn: tour, lastSeen: 13), [3, 6])
     }
 }

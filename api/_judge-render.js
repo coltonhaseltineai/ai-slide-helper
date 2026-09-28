@@ -38,7 +38,7 @@ const PREP_SCHEMA = {
 };
 
 // ASCII whitespace only, so JavaScript and Swift agree exactly.
-function squash(s) { return String(s == null ? '' : s).replace(/[ \t\r\n]+/g, ' ').trim(); }
+function squash(s) { return String(s == null ? '' : s).replace(/[ \t\r\n]+/g, ' ').replace(/^ | $/g, ''); }
 // First n Unicode code points.
 function clip(s, n) { const cps = Array.from(s); return cps.length > n ? cps.slice(0, n).join('') : s; }
 

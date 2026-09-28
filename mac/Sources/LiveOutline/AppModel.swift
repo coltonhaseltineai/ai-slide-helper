@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 import MatcherCore
 
@@ -5,6 +6,55 @@ import MatcherCore
 @Observable
 final class AppModel {
     enum Mode { case edit, present }
+
+    /// The "Follow by meaning" setting.
+    enum FollowMode: String, CaseIterable, Identifiable {
+        case automatic, onDevice, tiny, claude, keywords
+        var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .automatic: return "Automatic"
+            case .onDevice: return "Apple on-device model"
+            case .tiny: return "Tiny meaning model"
+            case .claude: return "Claude"
+            case .keywords: return "Keywords only"
+            }
+        }
+
+        var detail: String {
+            switch self {
+            case .automatic: return "Free and private: Apple's on-device model when this Mac has it, otherwise the tiny meaning model."
+            case .onDevice: return "Apple Intelligence, on this Mac. Free, private, works offline. Needs macOS 26 and Apple silicon."
+            case .tiny: return "A small meaning model that runs on any Mac in milliseconds. Downloads once (about 15 MB)."
+            case .claude: return "Sends the last few seconds of speech to Claude. Needs an access code and internet."
+            case .keywords: return "Only moves when you say the outline's own words (or its [cues:])."
+            }
+        }
+    }
+
+    /// What is following the speaker right now.
+    enum Engine: String, Codable {
+        case onDevice, tiny, claude, keywords
+
+        var label: String {
+            switch self {
+            case .onDevice: return "On your Mac"
+            case .tiny: return "Tiny model"
+            case .claude: return "Claude"
+            case .keywords: return "Keywords"
+            }
+        }
+
+        var symbol: String {
+            switch self {
+            case .onDevice: return "cpu"
+            case .tiny: return "sparkles"
+            case .claude: return "cloud"
+            case .keywords: return "text.magnifyingglass"
+            }
+        }
+    }
 
     static let sample = """
     Welcome and introductions
@@ -20,78 +70,82 @@ final class AppModel {
     var outlineText: String {
         didSet { UserDefaults.standard.set(outlineText, forKey: "outline") }
     }
+    var followMode: FollowMode {
+        didSet {
+            UserDefaults.standard.set(followMode.rawValue, forKey: "followMode")
+            if mode == .present { startEngine() }
+        }
+    }
+    var accessCode: String {
+        didSet { UserDefaults.standard.set(accessCode, forKey: "accessCode") }
+    }
+
     var mode: Mode = .edit
     private(set) var matcher = Matcher(items: [])
     private(set) var current = 0
     let listener = SpeechListener()
 
-    // Smart following (Claude)
-    var aiEnabled: Bool {
-        didSet { UserDefaults.standard.set(aiEnabled, forKey: "aiEnabled"); aiDisabledReason = nil }
-    }
-    var accessCode: String {
-        didSet { UserDefaults.standard.set(accessCode, forKey: "accessCode"); aiDisabledReason = nil }
-    }
-    var aiDisabledReason: String?
-    private(set) var library: LearnedLibrary
-    private(set) var learnedPulse = 0
-    /// Words just learned for a point, shown briefly beside it while presenting.
-    private(set) var learnedFlash: LearnedFlash?
+    /// Who is following right now, and why it isn't what the setting asked for (if it isn't).
+    private(set) var engine: Engine = .keywords
+    private(set) var engineNote: String?
+    /// True while a judge is thinking (the status label pulses).
+    private(set) var isJudging = false
+    private(set) var stats = SessionStats(engine: "keywords")
+    private(set) var lastStats: SessionStats?
 
-    struct LearnedFlash: Equatable {
-        let id = UUID()
-        let index: Int
-        let words: [String]
-    }
-
-    /// Words from the current recognition pass that were already given to the matcher.
-    private var fedWordCount = 0
-    private var chunks: [(time: Date, text: String)] = []
-    private var lastCallAt = Date.distantPast
-    private var lastConfidentAt = Date()
-    private var newWords = 0
-    private var locateTask: Task<Void, Never>?
-    private var teachTask: Task<Void, Never>?
-    private var expandTask: Task<Void, Never>?
-    private var lastTeachAt = Date.distantPast
-    private var ticker: Timer?
+    // Live state for the current presentation.
+    @ObservationIgnored private var follower = Follower(count: 0)
+    @ObservationIgnored private var judge: (any Judge)?
+    @ObservationIgnored private var cadence = JudgeCadence.onDevice
+    @ObservationIgnored private var tiny: TinyFollower?
+    @ObservationIgnored private var tinyChain: Task<Void, Never>?
+    @ObservationIgnored private var lastTinyVerdict: JudgeVerdict?
+    @ObservationIgnored private var prep: [PointPrep]?
+    @ObservationIgnored private var prepCache: [String: [PointPrep]] = [:]   // in memory only, from the outline
+    @ObservationIgnored private var session = UUID()
+    @ObservationIgnored private var clockStart = ProcessInfo.processInfo.systemUptime
+    @ObservationIgnored private var chunks: [TimedChunk] = []
+    @ObservationIgnored private var fedWordCount = 0
+    @ObservationIgnored private var lastAskAt = -1e9
+    @ObservationIgnored private var lastWordAt = 0.0
+    @ObservationIgnored private var newWords = 0
+    @ObservationIgnored private var seq = 0
+    @ObservationIgnored private var tinySeq = 0
+    @ObservationIgnored private var judgeInFlight = false
+    @ObservationIgnored private var lastRecheckAt = 0.0
+    @ObservationIgnored private var ticker: Timer?
+    @ObservationIgnored private var activity: NSObjectProtocol?
 
     var items: [OutlineItem] { matcher.items }
     var previewItems: [OutlineItem] { parseOutline(outlineText) }
-    var learnedCount: Int { library.learnedCount }
-    private var aiOn: Bool { aiEnabled && aiDisabledReason == nil }
-    private var client: SmartClient { SmartClient(accessCode: accessCode) }
 
     init() {
         let defaults = UserDefaults.standard
         outlineText = defaults.string(forKey: "outline") ?? Self.sample
-        aiEnabled = defaults.object(forKey: "aiEnabled") as? Bool ?? true
         accessCode = defaults.string(forKey: "accessCode") ?? ""
-        if let data = defaults.data(forKey: "library"),
-           let saved = try? JSONDecoder().decode(LearnedLibrary.self, from: data) {
-            library = saved
-        } else {
-            library = LearnedLibrary()
-        }
+        followMode = defaults.string(forKey: "followMode").flatMap(FollowMode.init(rawValue:)) ?? .automatic
+        // Live Outline no longer learns words; forget anything older versions saved.
+        defaults.removeObject(forKey: "library")
+        defaults.removeObject(forKey: "aiEnabled")
+        if let data = defaults.data(forKey: "lastSession") { lastStats = try? JSONDecoder().decode(SessionStats.self, from: data) }
         listener.onTranscript = { [weak self] text, isFinal in
             self?.handle(text: text, isFinal: isFinal)
         }
     }
 
+    // MARK: - Presenting
+
     func toggleMode() {
         if mode == .edit {
             matcher = Matcher(items: parseOutline(outlineText))
-            current = max(matcher.current, 0)
+            follower = Follower(count: matcher.items.count, policy: .live, current: max(matcher.current, 0))
+            current = follower.current
             listener.contextualStrings = matcher.items.flatMap { [$0.text] + $0.cues }
-            chunks = []
-            lastCallAt = Date()
-            lastConfidentAt = Date()
-            newWords = 0
-            locateTask?.cancel()
-            loadLibrary()
             mode = .present
+            startEngine()
         } else {
             stopListening()
+            endSession()
             mode = .edit
         }
     }
@@ -103,9 +157,11 @@ final class AppModel {
         } else {
             fedWordCount = 0
             listener.start()
-            // "Unsure for a while" can happen between words, so check on a timer too.
-            ticker = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
-                Task { @MainActor in self?.maybeLocate() }
+            // Keep following at full speed while Keynote or another app is in front.
+            activity = ProcessInfo.processInfo.beginActivity(options: .userInitiated, reason: "Following the speaker")
+            // Pauses matter too ("… [0.8 s pause]"), so check on a timer as well as on every word.
+            ticker = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+                Task { @MainActor in self?.tick() }
             }
         }
     }
@@ -114,19 +170,242 @@ final class AppModel {
         listener.stop()
         ticker?.invalidate()
         ticker = nil
+        if let activity { ProcessInfo.processInfo.endActivity(activity) }
+        activity = nil
     }
 
-    /// Moves the highlight by hand; Claude learns from the correction.
+    /// Moves the highlight by hand. Always wins over the judges.
     func select(_ index: Int) {
-        let before = matcher.current
-        matcher.setCurrent(index)
-        current = matcher.current
-        guard current != before else { return }
-        lastConfidentAt = Date()
-        teachSoon()
+        guard !matcher.items.isEmpty else { return }
+        follower.manual(index, at: now())
+        matcher.setCurrent(follower.current)
+        tiny?.reset(to: follower.current)
+        if current != follower.current { stats.moves["manual", default: 0] += 1 }
+        current = follower.current
     }
 
     func step(_ delta: Int) { select(current + delta) }
+
+    private func now() -> Double { ProcessInfo.processInfo.systemUptime - clockStart }
+
+    // MARK: - Choosing who follows
+
+    /// Sets up the judge and/or tiny model for this presentation, falling back with a clear reason.
+    private func startEngine() {
+        session = UUID()
+        clockStart = ProcessInfo.processInfo.systemUptime
+        chunks = []
+        lastAskAt = -1e9; lastWordAt = 0; newWords = 0; seq = 0; tinySeq = 0
+        judgeInFlight = false; isJudging = false; lastRecheckAt = 0
+        judge = nil; tiny = nil; lastTinyVerdict = nil; prep = nil
+        tinyChain?.cancel(); tinyChain = nil
+        engineNote = nil
+
+        let outline = matcher.items
+        let onDevice = OnDevice.status()
+        switch followMode {
+        case .automatic:
+            if onDevice.isReady, let j = OnDevice.makeJudge(rules: AppResources.judgeRules) {
+                use(.onDevice, judge: j, cadence: .onDevice)
+            } else {
+                startTiny(note: "Apple's on-device model: \(onDevice.label.lowercased()).")
+            }
+        case .onDevice:
+            if let j = OnDevice.makeJudge(rules: AppResources.judgeRules) {
+                use(.onDevice, judge: j, cadence: .onDevice)
+            } else {
+                use(.keywords, note: onDevice.message)
+            }
+        case .tiny:
+            startTiny(note: nil)
+        case .claude:
+            if accessCode.isEmpty {
+                use(.keywords, note: "Add your access code in Settings to use Claude.")
+            } else {
+                use(.claude, judge: ClaudeJudge(model: "haiku", accessCode: accessCode), cadence: .claude)
+            }
+        case .keywords:
+            use(.keywords)
+        }
+        stats = SessionStats(engine: engine.rawValue)
+        if let judge { Task { await judge.prepare(outline: outline, gists: nil) } }
+    }
+
+    private func use(_ e: Engine, judge: (any Judge)? = nil, cadence: JudgeCadence = .onDevice, note: String? = nil) {
+        engine = e
+        self.judge = judge
+        self.cadence = cadence
+        engineNote = note
+        stats.engine = e.rawValue
+    }
+
+    /// The tiny meaning model: downloads once, then builds anchors from the outline (plus a gist and
+    /// examples written by Apple's model when it's available). Keywords follow until it's ready.
+    private func startTiny(note: String?) {
+        use(.keywords, note: "Getting the tiny meaning model ready…")
+        let s = session
+        let outline = matcher.items
+        Task {
+            await ModelStore.shared.ensure()
+            guard s == session else { return }
+            guard let embedder = ModelStore.shared.embedder else {
+                if case .failed(let why) = ModelStore.shared.state { engineNote = "Couldn't get the tiny meaning model: \(why)" }
+                return
+            }
+            await buildTiny(embedder: embedder, outline: outline, prep: nil, session: s)
+            guard s == session, tiny != nil else { return }
+            use(.tiny, note: note)
+            // Better anchors: Apple's model writes a gist and example sentences per point (in memory only).
+            let key = outline.map { "\($0.level)|\($0.text)|\($0.cues.joined(separator: ","))" }.joined(separator: "\n")
+            if let cached = prepCache[key] {
+                await buildTiny(embedder: embedder, outline: outline, prep: cached, session: s)
+            } else if OnDevice.status().isReady, let written = try? await OnDevice.writePrep(outline: outline, rules: AppResources.prepRules) {
+                prepCache[key] = written
+                await buildTiny(embedder: embedder, outline: outline, prep: written, session: s)
+            }
+        }
+    }
+
+    private func buildTiny(embedder: SentenceEmbedder, outline: [OutlineItem], prep: [PointPrep]?, session s: UUID) async {
+        let profile = AppResources.profile("\(ModelStore.profileKey):\(prep == nil ? "bare" : "prep")")
+        let t = TinyFollower(embedder: embedder, count: outline.count, profile: profile)
+        do { try await t.prepare(outline: outline, prep: prep) } catch { return }
+        guard s == session else { return }
+        t.reset(to: follower.current)
+        tiny = t
+        self.prep = prep
+    }
+
+    private func fallBack(_ failure: JudgeFailure) {
+        stats.fallbacks.append(failure.kind)
+        judge = nil
+        if engine == .onDevice, followMode == .automatic {
+            startTiny(note: failure.message)
+        } else {
+            use(.keywords, note: failure.message)
+        }
+    }
+
+    private func endSession() {
+        session = UUID()
+        judge = nil; tiny = nil
+        tinyChain?.cancel()
+        isJudging = false
+        guard stats.minutes > 0.1 || stats.judgeCalls > 0 else { return }
+        lastStats = stats
+        if let data = try? JSONEncoder().encode(stats) { UserDefaults.standard.set(data, forKey: "lastSession") }
+    }
+
+    // MARK: - Speech
+
+    /// Speech arrives as a growing transcript; feed only the words that are new and settled.
+    private func handle(text: String, isFinal: Bool) {
+        let words = text.split(whereSeparator: \.isWhitespace)
+        if words.count < fedWordCount { fedWordCount = 0 }  // a new recognition pass started
+        // The last word of a partial result can still change, so hold it back.
+        let settled = isFinal ? words.count : max(words.count - 1, 0)
+        if settled - fedWordCount >= 3 || (isFinal && settled > fedWordCount) {
+            let chunk = words[fedWordCount..<settled].joined(separator: " ")
+            fedWordCount = settled
+            feed(chunk)
+        }
+        if isFinal { fedWordCount = 0 }
+    }
+
+    private func feed(_ raw: String) {
+        let chunk = Meaning.asrText(raw)
+        guard !chunk.isEmpty, mode == .present else { return }
+        let t = now()
+        chunks.append(TimedChunk(t: t, text: chunk))
+        chunks.removeAll { t - $0.t > 60 }
+        newWords += chunk.split(separator: " ").count
+        lastWordAt = t
+        stats.minutes = t / 60
+
+        if engine == .keywords {
+            _ = matcher.feed(chunk)
+            if follower.keyword(matcher.current, at: t) { moved(by: "keyword") } else if matcher.current != follower.current { matcher.setCurrent(follower.current) }
+        }
+        if let tiny, engine == .tiny { observeTiny(tiny, at: t) }
+        maybeJudge()
+    }
+
+    /// Runs the tiny model on every settled chunk, in order.
+    private func observeTiny(_ tiny: TinyFollower, at t: Double) {
+        let snapshot = chunks, s = session, previous = tinyChain
+        tinyChain = Task {
+            await previous?.value
+            guard s == session else { return }
+            let asked = follower.current
+            guard let v = try? await tiny.observe(chunks: snapshot, now: t, current: asked), s == session else { return }
+            lastTinyVerdict = v
+            tinySeq += 1
+            let d = follower.verdict(v, seq: tinySeq, askedAt: t, askedCurrent: asked, at: now(), source: "tiny")
+            if d.didMove { moved(by: "tiny") }
+        }
+    }
+
+    private func tick() {
+        guard mode == .present else { return }
+        stats.minutes = max(stats.minutes, now() / 60)
+        // Apple's model may become ready (download finished, Apple Intelligence turned on): switch back to it.
+        if followMode != .keywords, followMode != .claude, followMode != .tiny, engine != .onDevice, now() - lastRecheckAt > 30 {
+            lastRecheckAt = now()
+            if OnDevice.status().isReady, let j = OnDevice.makeJudge(rules: AppResources.judgeRules) {
+                tiny = nil
+                use(.onDevice, judge: j, cadence: .onDevice)
+                let outline = matcher.items
+                Task { await j.prepare(outline: outline, gists: nil) }
+            }
+        }
+        maybeJudge()
+    }
+
+    // MARK: - Judging
+
+    private func maybeJudge() {
+        guard mode == .present, listener.isListening, let judge, !judgeInFlight, !judge.isBusy else { return }
+        let t = now()
+        guard shouldJudge(now: t, lastAskAt: lastAskAt, lastWordAt: lastWordAt, newWords: newWords, inFlight: false, cadence: cadence) else { return }
+        let lines = SpeechWindow.lines(chunks, now: t)
+        guard !lines.isEmpty else { return }
+        let input = JudgeInput(outline: matcher.items, current: follower.current, lines: lines)
+        lastAskAt = t
+        newWords = 0
+        seq += 1
+        let mySeq = seq, asked = follower.current, s = session, timeout = cadence.timeout
+        judgeInFlight = true
+        isJudging = true
+        stats.judgeCalls += 1
+        Task {
+            let started = ProcessInfo.processInfo.systemUptime
+            defer {
+                if s == session { judgeInFlight = false; isJudging = false }
+            }
+            do {
+                let reply = try await withDeadline(timeout) { try await judge.judge(input) }
+                guard s == session else { return }
+                stats.latencies.append(ProcessInfo.processInfo.systemUptime - started)
+                if reply.meta.usedFallback { stats.errors["fallback", default: 0] += 1 }
+                let d = follower.verdict(reply.verdict, seq: mySeq, askedAt: t, askedCurrent: asked, at: now())
+                if d.didMove { moved(by: "judge") }
+            } catch {
+                guard s == session, !(error is CancellationError) else { return }
+                let f = (error as? JudgeFailure) ?? .other(String(describing: error))
+                stats.errors[f.kind, default: 0] += 1
+                if f == .rateLimited { lastAskAt = now() + 5 }   // back off a little
+                if f.endsSession { fallBack(f) }
+            }
+        }
+    }
+
+    private func moved(by source: String) {
+        guard current != follower.current else { return }
+        current = follower.current
+        matcher.setCurrent(current)
+        tiny?.reset(to: current)
+        stats.moves[source, default: 0] += 1
+    }
 
     // MARK: - Tutorial
 
@@ -155,170 +434,34 @@ final class AppModel {
         UserDefaults.standard.set(max(seen, Tutorial.newest), forKey: "tutorialSeen")
         tutorial = nil
     }
+}
 
-    /// Learned words for an outline line, newest first.
-    func learnedWords(for text: String) -> [String] { library.learnedWords(text) }
+/// Counts for one presentation. No speech text, ever.
+struct SessionStats: Codable, Equatable {
+    var engine: String
+    var minutes: Double = 0
+    var judgeCalls = 0
+    var latencies: [Double] = []
+    var errors: [String: Int] = [:]
+    var moves: [String: Int] = [:]
+    var fallbacks: [String] = []
 
-    func removeLearned(_ word: String, for text: String) {
-        library.removeLearned(text, word)
-        saveLibrary()
+    func latency(_ q: Double) -> Double? {
+        let s = latencies.sorted()
+        guard !s.isEmpty else { return nil }
+        return s[min(s.count - 1, Int(q * Double(s.count)))]
     }
 
-    /// Lets you teach a word yourself. Takes effect the next time you present.
-    func addLearned(_ word: String, for text: String) {
-        let w = word.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        guard !w.isEmpty else { return }
-        library.addLearned(text, [w])
-        saveLibrary()
-    }
-
-    func resetLibrary() {
-        library = LearnedLibrary()
-        saveLibrary()
-    }
-
-    /// Speech arrives as a growing transcript; feed only the words that are new and settled.
-    private func handle(text: String, isFinal: Bool) {
-        let words = text.split(whereSeparator: \.isWhitespace)
-        if words.count < fedWordCount { fedWordCount = 0 }  // a new recognition pass started
-        // The last word of a partial result can still change, so hold it back.
-        let settled = isFinal ? words.count : max(words.count - 1, 0)
-        if settled - fedWordCount >= 3 || (isFinal && settled > fedWordCount) {
-            let chunk = words[fedWordCount..<settled].joined(separator: " ")
-            fedWordCount = settled
-            feed(chunk)
+    var summaryJSON: String {
+        var o: [String: Any] = [
+            "engine": engine, "minutes": (minutes * 10).rounded() / 10, "judgeCalls": judgeCalls,
+            "errors": errors, "moves": moves, "fallbacks": fallbacks, "app": SmartClient.appVersion,
+        ]
+        if let p50 = latency(0.5), let p90 = latency(0.9) {
+            o["latencyP50"] = (p50 * 100).rounded() / 100
+            o["latencyP90"] = (p90 * 100).rounded() / 100
         }
-        if isFinal { fedWordCount = 0 }
-    }
-
-    private func feed(_ chunk: String) {
-        let now = Date()
-        chunks.append((now, chunk))
-        chunks.removeAll { now.timeIntervalSince($0.time) > 60 }
-        newWords += chunk.split(whereSeparator: \.isWhitespace).count
-        let before = current
-        current = matcher.feed(chunk)
-        if current != before || matcher.hits(current, chunk) > 0 { lastConfidentAt = now }
-        maybeLocate()
-    }
-
-    private func recentTranscript(_ seconds: TimeInterval = 25) -> String {
-        let now = Date()
-        return chunks.filter { now.timeIntervalSince($0.time) < seconds }.map(\.text).joined(separator: " ")
-    }
-
-    // MARK: - Claude
-
-    /// Puts saved hint and learned words onto the outline, then fetches hints for any new lines.
-    private func loadLibrary() {
-        for (i, item) in matcher.items.enumerated() {
-            let w = library.words(item.text)
-            matcher.addKeywords(i, w.hints, source: .hint)
-            matcher.addKeywords(i, w.learned, source: .learned)
-        }
-        let items = matcher.items
-        guard aiOn, !items.isEmpty, !items.allSatisfy({ library.has($0.text) }) else { return }
-        let m = matcher
-        expandTask?.cancel()
-        expandTask = Task {
-            do {
-                let result = try await client.expand(items: items.map(\.text))
-                for (i, words) in result.hints.enumerated() where i < items.count {
-                    guard !words.isEmpty, !library.has(items[i].text) else { continue }
-                    library.setHints(items[i].text, words)
-                    m.addKeywords(i, words, source: .hint)
-                }
-                saveLibrary()
-            } catch {
-                aiFailed(error)
-            }
-        }
-    }
-
-    private func maybeLocate() {
-        guard mode == .present, aiOn else { return }
-        let now = Date().timeIntervalSince1970
-        guard shouldLocate(now: now, lastCallAt: lastCallAt.timeIntervalSince1970,
-                           lastConfidentAt: lastConfidentAt.timeIntervalSince1970,
-                           newWords: newWords, inFlight: locateTask != nil) else { return }
-        let transcript = recentTranscript()
-        guard !transcript.isEmpty else { return }
-        lastCallAt = Date()
-        newWords = 0
-        let m = matcher, asked = current, texts = matcher.items.map(\.text)
-        locateTask = Task {
-            defer { locateTask = nil }
-            do {
-                let r = try await client.locate(items: texts, current: asked, transcript: transcript)
-                guard m === matcher, texts.indices.contains(r.index) else { return }
-                // Don't override a correction the user made while Claude was thinking.
-                if r.confidence == "high", r.index != current, current == asked {
-                    matcher.setCurrent(r.index)
-                    current = r.index
-                }
-                if r.confidence == "high" || (r.confidence == "medium" && r.index == current) {
-                    learn(r.index, r.learned)
-                    lastConfidentAt = Date()
-                }
-            } catch {
-                aiFailed(error)
-            }
-        }
-    }
-
-    /// Waits for taps to settle, then teaches Claude's pick of words for the chosen point.
-    private func teachSoon() {
-        teachTask?.cancel()
-        teachTask = Task {
-            try? await Task.sleep(for: .seconds(1.5))
-            guard !Task.isCancelled else { return }
-            await teach(current)
-        }
-    }
-
-    private func teach(_ index: Int) async {
-        guard aiOn, Date().timeIntervalSince(lastTeachAt) > 4 else { return }
-        let transcript = recentTranscript(15)
-        guard transcript.split(whereSeparator: \.isWhitespace).count >= 6 else { return }
-        lastTeachAt = Date()
-        let m = matcher
-        do {
-            let r = try await client.locate(items: m.items.map(\.text), current: index, transcript: transcript, known: index)
-            if m === matcher { learn(index, r.learned) }
-        } catch {
-            aiFailed(error)
-        }
-    }
-
-    private func learn(_ index: Int, _ words: [String]) {
-        guard !words.isEmpty, matcher.items.indices.contains(index) else { return }
-        matcher.addKeywords(index, words, source: .learned)
-        let text = matcher.items[index].text
-        let known = Set(library.learnedWords(text))
-        let fresh = Array(Set(words.map { $0.lowercased().trimmingCharacters(in: .whitespaces) }))
-            .filter { !$0.isEmpty && !known.contains($0) }.sorted()
-        guard library.addLearned(text, words) > 0 else { return }
-        saveLibrary()
-        learnedPulse += 1
-        let flash = LearnedFlash(index: index, words: fresh)
-        learnedFlash = flash
-        Task {
-            try? await Task.sleep(for: .seconds(4))
-            if learnedFlash == flash { learnedFlash = nil }
-        }
-    }
-
-    private func saveLibrary() {
-        if let data = try? JSONEncoder().encode(library) {
-            UserDefaults.standard.set(data, forKey: "library")
-        }
-    }
-
-    /// Stops calling Claude for this session after a setup problem, and says why once.
-    private func aiFailed(_ error: Error) {
-        if error is CancellationError { return }
-        if let e = error as? SmartClient.APIError, e.isSetupProblem {
-            aiDisabledReason = e.status == 404 ? "Smart following isn't available on the server yet." : e.message
-        }
+        let data = (try? JSONSerialization.data(withJSONObject: o, options: [.prettyPrinted, .sortedKeys])) ?? Data()
+        return String(data: data, encoding: .utf8) ?? "{}"
     }
 }

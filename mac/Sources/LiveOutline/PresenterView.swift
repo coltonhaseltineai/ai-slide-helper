@@ -86,14 +86,6 @@ struct PresenterView: View {
                         .matchedGeometryEffect(id: "highlight", in: highlight)
                 }
             }
-            .overlay(alignment: .trailing) {
-                if let flash = model.learnedFlash, flash.index == item.id, !flash.words.isEmpty {
-                    LearnedFlashView(words: flash.words)
-                        .padding(.trailing, 16)
-                        .transition(.move(edge: .trailing).combined(with: .opacity))
-                }
-            }
-            .animation(.spring(response: 0.4, dampingFraction: 0.8), value: model.learnedFlash)
             .padding(.leading, CGFloat(item.level) * 36)
             .contentShape(Rectangle())
     }
@@ -118,24 +110,9 @@ private struct ProgressHeader: View {
                 Text("\(model.current + 1) of \(model.items.count)")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
-                if model.learnedCount > 0 {
-                    Label("\(model.learnedCount) learned", systemImage: "brain")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.accentColor)
-                        .padding(.horizontal, 8).padding(.vertical, 2)
-                        .background(Color.accentColor.opacity(0.14), in: Capsule())
-                        .contentTransition(.numericText())
-                        .symbolEffect(.bounce, value: model.learnedPulse)
-                        .help("Words Live Outline has learned from how you speak")
-                }
-                if let reason = model.aiDisabledReason {
-                    Label("Smart following off", systemImage: "exclamationmark.triangle.fill")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                        .help(reason + " Change this in Settings (⌘,).")
-                }
+                Spacer()
+                EngineBadge()
             }
-            .animation(.snappy, value: model.learnedCount)
         }
         .padding(.horizontal, 48)
         .padding(.top, 16)
@@ -191,23 +168,20 @@ private struct LevelMeter: View {
     }
 }
 
-/// "Learned: blue light, pillow" — shown briefly when Live Outline picks up new words for a point.
-private struct LearnedFlashView: View {
-    let words: [String]
+/// Who is following the speaker: "On your Mac", "Tiny model", "Claude" or "Keywords" (and why, if it fell back).
+private struct EngineBadge: View {
+    @Environment(AppModel.self) private var model
 
     var body: some View {
-        Label {
-            Text("Learned: " + words.prefix(4).joined(separator: ", "))
-                .lineLimit(1)
-        } icon: {
-            Image(systemName: "brain")
-        }
-        .font(.callout.weight(.medium))
-        .foregroundStyle(Color.accentColor)
-        .padding(.horizontal, 12).padding(.vertical, 6)
-        .background(.regularMaterial, in: Capsule())
-        .overlay(Capsule().strokeBorder(Color.accentColor.opacity(0.3)))
-        .shadow(color: .black.opacity(0.1), radius: 8, y: 3)
-        .frame(maxWidth: 340, alignment: .trailing)
+        let e = model.engine
+        let fellBack = model.engineNote != nil && e == .keywords && model.followMode != .keywords
+        Label(fellBack ? "Following by keywords" : e.label, systemImage: fellBack ? "exclamationmark.triangle.fill" : e.symbol)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(fellBack ? Color.orange : Color.accentColor)
+            .padding(.horizontal, 8).padding(.vertical, 2)
+            .background((fellBack ? Color.orange : Color.accentColor).opacity(0.14), in: Capsule())
+            .opacity(model.isJudging ? 0.55 : 1)
+            .animation(model.isJudging ? .easeInOut(duration: 0.5).repeatForever(autoreverses: true) : .default, value: model.isJudging)
+            .help((model.engineNote.map { $0 + " " } ?? "") + "Change this in Settings (⌘,).")
     }
 }

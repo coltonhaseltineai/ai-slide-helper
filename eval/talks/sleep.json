@@ -1,0 +1,213 @@
+{
+ "schema": "live-outline-talk/1",
+ "id": "sleep",
+ "title": "Why Sleep Matters (and How to Get More of It)",
+ "tier": "paraphrased",
+ "speaker": {
+  "persona": "Former night-shift nurse who hosts a library wellness series; warm, chatty, wanders into stories",
+  "wpm": 155
+ },
+ "outlineText": "Welcome and introductions\nWhy sleep matters\n  Memory consolidation\n  Immune health [cues: colds, flu]\n  Mood and focus\nHow much sleep you need\nTips for better sleep\n  Keep a consistent schedule\n  Avoid screens before bed [cues: phone, blue light]\n  Cool, dark bedroom\n  Watch caffeine and alcohol\nQuestions",
+ "confusable": [
+  [
+   2,
+   4
+  ],
+  [
+   8,
+   9
+  ],
+  [
+   5,
+   7
+  ]
+ ],
+ "segments": [
+  {
+   "say": "Hi everybody, um, thanks for coming out tonight. I'm Dana, I run the wellness series here at the library, and yes, before anybody asks, I did get a full eight hours last night. Mostly.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "Oh, quick thing, whoever's got the silver hatchback in the side lot with the headlights on, that battery's got maybe an hour left, just so you know.",
+   "truth": 0,
+   "kind": "tangent"
+  },
+  {
+   "say": "So a little about me, I was a nurse for ten years, mostly overnight shifts, kind of ironic. Let's go around, just shout out your first name and rate your mornings, one to ten.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "Okay. Alright, um, so. Let's get going.",
+   "truth": 1,
+   "kind": "transition",
+   "accept": [
+    0
+   ]
+  },
+  {
+   "say": "Here's the big thing I want you to walk out with. Rest is honestly the foundation. Food, exercise, your job, all of it sits on top of those hours when you're conked out.",
+   "truth": 1,
+   "kind": "on"
+  },
+  {
+   "say": "I used to think the body just switches off at night, and it's the total opposite. Nothing works without proper rest overnight, not your brain, not your heart, none of it.",
+   "truth": 1,
+   "kind": "on"
+  },
+  {
+   "say": "And I promise we'll get to the practical what-do-I-do-tonight stuff in a bit, so hang on to that.",
+   "truth": 1,
+   "kind": "preview"
+  },
+  {
+   "say": "So one of the neatest things going on while you're out is your brain filing the day. A new piano piece, your kid's teacher's name, it all gets replayed and moved from the short-term pile into long-term storage.",
+   "truth": 2,
+   "kind": "on"
+  },
+  {
+   "say": "There's this classic kind of study where people learn word pairs, and the group that dozes afterward recalls way more the next morning. Which is why cramming all night kind of backfires, you never let it stick.",
+   "truth": 2,
+   "kind": "on"
+  },
+  {
+   "say": "Totally unrelated, but I was in Lisbon last spring and got hopelessly lost looking for this bakery with the custard tarts, and ended up at, like, a tram museum instead. Anyway.",
+   "truth": 2,
+   "kind": "tangent"
+  },
+  {
+   "say": "The other big one is your body's defense system. While you're zonked, it's cranking out proteins that go after germs, so if you skimp, it's like sending the security guards home early.",
+   "truth": 3,
+   "kind": "on"
+  },
+  {
+   "say": "In one study, folks averaging under six hours were way more likely to catch the sniffles after researchers literally dripped a virus up their noses. Who volunteers for that?",
+   "truth": 3,
+   "kind": "on"
+  },
+  {
+   "say": "It's kind of the same deal as that filing thing I mentioned a minute ago, your brain does its tidying and your germ fighters do theirs, all on the night shift.",
+   "truth": 3,
+   "kind": "callback"
+  },
+  {
+   "say": "And then there's how you feel and whether you can pay attention. After a short night the emotional part of your brain gets twitchy, you snap at your partner over the dishwasher, and you can't concentrate on a spreadsheet for five minutes.",
+   "truth": 4,
+   "kind": "on"
+  },
+  {
+   "say": "Um, sorry, hold on, I had a number for this, let me find my note card... nope, that's my grocery list. Never mind.",
+   "truth": 4,
+   "kind": "filler"
+  },
+  {
+   "say": "The gist is, after eighteen or nineteen hours awake, your reaction time and alertness look a lot like someone who's had a couple of drinks. Scary thought on the highway.",
+   "truth": 4,
+   "kind": "on"
+  },
+  {
+   "say": "So how many hours are we actually talking? For most grown-ups it's around seven to nine a night. Teenagers, more like eight to ten, and little kids even more.",
+   "truth": 5,
+   "kind": "on"
+  },
+  {
+   "say": "Remember that foundation thing I said at the start, well, this is basically the size of that foundation.",
+   "truth": 5,
+   "kind": "callback"
+  },
+  {
+   "say": "People always tell me, oh, I do fine on five. There is a tiny group with a rare gene that genuinely gets by on less, but you are almost certainly not one of them. Sorry. I'm not either.",
+   "truth": 5,
+   "kind": "on"
+  },
+  {
+   "say": "And yes, we'll get to the afternoon latte situation later, I can see a couple of you clutching one right now.",
+   "truth": 5,
+   "kind": "preview"
+  },
+  {
+   "say": "Okay, so the part you actually came for, what can you do about it starting tonight? None of this is magic. Pick one or two changes, try them for a couple of weeks, and see what happens.",
+   "truth": 6,
+   "kind": "on"
+  },
+  {
+   "say": "The first one is boring but it's probably the most powerful. Go to bed and get up at the same time every day, weekends included, I know, I know. Your body runs on an internal clock and it loves routine.",
+   "truth": 7,
+   "kind": "on"
+  },
+  {
+   "say": "If you stay up till two on Saturday and lie in till eleven, you're basically giving yourself jet lag, every single week, and Monday feels awful.",
+   "truth": 7,
+   "kind": "on"
+  },
+  {
+   "say": "And then the room itself, you want it like a cave. Chilly, pitch black, quiet. Around sixty-five degrees works for most people, which my husband and I argue about constantly.",
+   "truth": 9,
+   "kind": "skip"
+  },
+  {
+   "say": "Blackout curtains are worth every penny. And if there's a little blinking charger glowing across the room, stick a piece of tape over it. Sounds silly, works.",
+   "truth": 9,
+   "kind": "on"
+  },
+  {
+   "say": "Wait, hmm, hang on, I feel like I missed something, let me look at my notes. Yeah. Yeah, I did.",
+   "truth": 9,
+   "kind": "filler"
+  },
+  {
+   "say": "Oh shoot, I totally jumped over the late-night scrolling thing, which is the one I'm worst at, so let me back up.",
+   "truth": 8,
+   "kind": "goback"
+  },
+  {
+   "say": "That last hour of the evening, put down the tablet, close the laptop. That glow tricks your brain into thinking it's still daytime and holds off melatonin, the hormone that makes you drowsy.",
+   "truth": 8,
+   "kind": "on"
+  },
+  {
+   "say": "And it's also what you're reading. One email from your boss at eleven and your heart's racing. So all my gadgets spend the night in the kitchen now, and I bought an old-school alarm clock for eight bucks.",
+   "truth": 8,
+   "kind": "on"
+  },
+  {
+   "say": "Okay, so, back on track, after the room stuff the last one is what's in your cup, your coffee mug and your wine glass.",
+   "truth": 10,
+   "kind": "resume"
+  },
+  {
+   "say": "That afternoon latte hangs around way longer than you'd think. About half of it's still in your system five or six hours later, so I switch to decaf after lunch.",
+   "truth": 10,
+   "kind": "on"
+  },
+  {
+   "say": "And the nightcap, I know, a glass of wine makes you drowsy at first, but it wrecks the second half of the night, you wake up at three all hot and restless. So have it with dinner instead.",
+   "truth": 10,
+   "kind": "on"
+  },
+  {
+   "say": "Okay. So, um, yeah. That's, uh, that's what I've got.",
+   "truth": 11,
+   "kind": "transition",
+   "accept": [
+    10
+   ]
+  },
+  {
+   "say": "So, what have you got for me? Hands up, and no, I won't judge anyone's three AM habits.",
+   "truth": 11,
+   "kind": "on"
+  },
+  {
+   "say": "Um, can somebody just, yeah, pass it back, thanks, sorry.",
+   "truth": 11,
+   "kind": "filler"
+  },
+  {
+   "say": "Yes, in the back. Oh, naps, great one. A short one, twenty minutes, early afternoon, totally fine. Any longer or later than about four and you're stealing from tonight.",
+   "truth": 11,
+   "kind": "on"
+  }
+ ]
+}

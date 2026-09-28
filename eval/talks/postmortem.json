@@ -1,0 +1,205 @@
+{
+ "schema": "live-outline-talk/1",
+ "id": "postmortem",
+ "title": "Checkout Outage Postmortem",
+ "tier": "natural",
+ "speaker": {
+  "persona": "Backend engineer who ran the incident at an online retailer; over-explains, wanders into war stories",
+  "wpm": 160
+ },
+ "outlineText": "Checkout outage postmortem\nTimeline\n  Detection [cues: alerts, pager]\n  Mitigation and rollback\nCustomer impact\n  Failed orders and refunds\nRoot cause\n  Contributing factors\nWhat went well\nAction items\n  Owners and due dates\nLessons learned",
+ "confusable": [
+  [
+   6,
+   7
+  ],
+  [
+   1,
+   2
+  ],
+  [
+   2,
+   3
+  ],
+  [
+   4,
+   5
+  ],
+  [
+   9,
+   10
+  ],
+  [
+   8,
+   11
+  ]
+ ],
+ "segments": [
+  {
+   "say": "Okay, hi everyone, can you hear me in the back? Cool. So this is the writeup for the checkout thing two weeks ago, that Tuesday where nobody could buy anything.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "And before I start, this is blameless, right? Nobody's in trouble. We're figuring out how the system let this happen, not who pressed the button.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "Alright, so, um. Let's start at the start.",
+   "truth": 1,
+   "kind": "transition",
+   "accept": [
+    0
+   ]
+  },
+  {
+   "say": "So at two ten in the afternoon a config change goes out to the payments service, totally routine. By two fourteen the error graphs start creeping up, just a little wiggle.",
+   "truth": 1,
+   "kind": "on"
+  },
+  {
+   "say": "Around two thirty it's not a wiggle anymore, it's a cliff. Two forty we open an incident channel, two fifty two we're pretty sure it's the payments change, and by three oh one it's all green again.",
+   "truth": 1,
+   "kind": "on"
+  },
+  {
+   "say": "And yeah, I know the obvious question is how one little change did all that. I'll get to the actual why in a few minutes.",
+   "truth": 1,
+   "kind": "preview"
+  },
+  {
+   "say": "So, getting us back up. Once we suspected the payments change, the fix was honestly boring, we reverted the config to the previous version and restarted the pods. No heroics, just, undo.",
+   "truth": 3,
+   "kind": "skip"
+  },
+  {
+   "say": "The annoying part is the undo took nine minutes instead of one, because the deploy pipeline was queued behind other teams' releases, with no break glass button to jump the line. So we sat there watching a progress bar.",
+   "truth": 3,
+   "kind": "on"
+  },
+  {
+   "say": "Side note, during those nine minutes Raj's dog lost its mind at the mail carrier, and Raj was unmuted, so the whole bridge call had barking in the background. Honestly it lightened the mood.",
+   "truth": 3,
+   "kind": "tangent"
+  },
+  {
+   "say": "Okay so who actually felt this. For about fifty minutes, roughly a third of the people trying to pay got a spinner and then an error page. Web and mobile, every region, and support got something like two thousand chats that afternoon.",
+   "truth": 4,
+   "kind": "on"
+  },
+  {
+   "say": "Um, sorry, hang on, my laptop just went to sleep. Okay, it's back. Technology, right? In a talk about technology breaking.",
+   "truth": 4,
+   "kind": "filler"
+  },
+  {
+   "say": "In actual purchases, about eleven thousand checkouts just didn't go through. Most people retried later, but about four hundred got charged by the card processor and never got anything, so finance paid those back by hand the next morning, plus an apology coupon.",
+   "truth": 5,
+   "kind": "on"
+  },
+  {
+   "say": "And that's why those nine minutes stuck behind the pipeline, the ones I mentioned earlier, really stung. Every minute was more people getting charged for nothing.",
+   "truth": 5,
+   "kind": "callback"
+  },
+  {
+   "say": "Oh, wait, shoot, I jumped over something. I never told you how we even found out it was happening. Which is, um, a little embarrassing.",
+   "truth": 2,
+   "kind": "goback"
+  },
+  {
+   "say": "Our monitoring didn't catch it first. The error rate alarm looks at a fifteen minute average, so the slow build up hid inside that average, and the pager didn't go off until two thirty four.",
+   "truth": 2,
+   "kind": "on"
+  },
+  {
+   "say": "Who actually noticed first was Jess in support, around two twenty, after five chats in a row saying the pay button was broken. She posted in the engineering channel and for ten minutes people figured it was a one-off.",
+   "truth": 2,
+   "kind": "on"
+  },
+  {
+   "say": "Okay, sorry, back on track, and on to the big question. Why did a boring config change take down checkout? It comes down to one missing zero.",
+   "truth": 6,
+   "kind": "resume"
+  },
+  {
+   "say": "The change was supposed to bump the database connection pool for payments to two hundred. Somebody typed twenty. So under real traffic, requests line up for one of twenty connections, time out after thirty seconds, retry, and the retries make the line longer.",
+   "truth": 6,
+   "kind": "on"
+  },
+  {
+   "say": "Um, where was I. Let me just check my notes real quick. Yeah. Okay, got it.",
+   "truth": 6,
+   "kind": "filler"
+  },
+  {
+   "say": "So the typo pulled the trigger, but a typo alone shouldn't be able to do this, right? A few things lined up. First, config changes skip canary, unlike code. They go out everywhere at once.",
+   "truth": 7,
+   "kind": "on"
+  },
+  {
+   "say": "Second, the reviewer approved it on their phone between meetings, and twenty versus two hundred on a phone, I'd miss that too. And third, it was the fall sale, triple the traffic, and twenty connections might've limped through a normal day.",
+   "truth": 7,
+   "kind": "on"
+  },
+  {
+   "say": "And honestly that fifteen minute alarm window I talked about goes in this bucket too. It didn't start anything, but it made the whole thing drag on longer.",
+   "truth": 7,
+   "kind": "callback"
+  },
+  {
+   "say": "Also, totally unrelated, someone ordered four dozen donuts to the war room at three fifteen, after everything was fixed, so we all stood there eating donuts feeling weird. There are still some in the fridge.",
+   "truth": 7,
+   "kind": "tangent"
+  },
+  {
+   "say": "Okay, the good stuff. Once we called it an incident, things moved fast. Priya grabbed the commander role in like a minute, the status page was updated within five minutes, and support had a canned reply right after.",
+   "truth": 8,
+   "kind": "on"
+  },
+  {
+   "say": "And nobody went hunting for who made the typo. Not one person asked. People just asked what changed and can we undo it. That's exactly the behavior we want.",
+   "truth": 8,
+   "kind": "on"
+  },
+  {
+   "say": "I'm coming back to that no-blame thing at the very end, 'cause it's what I care most about out of this whole mess.",
+   "truth": 8,
+   "kind": "preview"
+  },
+  {
+   "say": "Okay. So. What now, basically.",
+   "truth": 9,
+   "kind": "transition",
+   "accept": [
+    8
+   ]
+  },
+  {
+   "say": "So, fixes. Config values get schema checks, so a pool size that drops ninety percent gets flagged. Config goes through canary same as code. We add an alarm on connection pool saturation, shrink that alarm window to like three minutes, and add a break glass lane so a rollback jumps the deploy queue.",
+   "truth": 9,
+   "kind": "on"
+  },
+  {
+   "say": "Each of those has a name and a date, 'cause otherwise it's a wish list. Maya's got schema checks by October fifteenth, Dev's got canary for config by end of October, and I've got the alarms this week, so hold me to it.",
+   "truth": 10,
+   "kind": "on"
+  },
+  {
+   "say": "We'll go through them at the Thursday ops sync every week until they're closed. If your date slips, fine, just say it out loud, don't let it quietly rot.",
+   "truth": 10,
+   "kind": "on"
+  },
+  {
+   "say": "So, big takeaways. For me, config is code. It can break things just as badly, so it deserves the same review, testing and slow rollout. We treated it like settings, and settings felt safe.",
+   "truth": 11,
+   "kind": "on"
+  },
+  {
+   "say": "And the other one is the blameless thing I promised to come back to. Whoever typed twenty is a good engineer who made a normal human mistake. If one keystroke can take down checkout, that's on the system. That's it. Questions?",
+   "truth": 11,
+   "kind": "on"
+  }
+ ]
+}

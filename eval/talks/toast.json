@@ -1,0 +1,207 @@
+{
+ "schema": "live-outline-talk/1",
+ "id": "toast",
+ "title": "Best Man Toast for Danny and Priya",
+ "tier": "paraphrased",
+ "speaker": {
+  "persona": "The groom's old college roommate giving his first best-man toast; nervous, rambly, keeps losing his place in his index cards",
+  "wpm": 158
+ },
+ "outlineText": "Introduce myself\nHow we met\n  Stuck as freshman roommates [cues: dorm]\n  Became inseparable\nThe camping trip disaster [cues: raccoon]\nEnter the bride\n  What changed\n  Why they work\nAdvice\n  Laugh at yourselves\n  Keep choosing each other\nRaise a glass",
+ "confusable": [
+  [
+   1,
+   4
+  ],
+  [
+   6,
+   7
+  ],
+  [
+   9,
+   10
+  ],
+  [
+   2,
+   3
+  ]
+ ],
+ "segments": [
+  {
+   "say": "Hi. Hi everyone. Um, wow, that's a lot of faces. For those who don't know me, I'm Marcus, the best man, which I'm told is a title I have to give back at midnight, so I'm enjoying it.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "Also, whoever picked the tacos for cocktail hour, thank you, I had seven. Seven. My tux is making noises. Anyway.",
+   "truth": 0,
+   "kind": "tangent"
+  },
+  {
+   "say": "So yeah, for Priya's side of the room, I'm the guy in the background of every embarrassing photo Danny owns. And Priya asked me to stay under five minutes, and I said absolutely. We'll see.",
+   "truth": 0,
+   "kind": "on"
+  },
+  {
+   "say": "Okay. So. Let's, uh, let's start at the start.",
+   "truth": 1,
+   "kind": "transition",
+   "accept": [
+    0
+   ]
+  },
+  {
+   "say": "Danny and I go back fifteen years, and people always ask how two guys this different ever crossed paths. Honestly, nobody set us up. It was a computer, some housing office algorithm that looked at two random eighteen year olds and went, yeah, these two, let's see.",
+   "truth": 1,
+   "kind": "on"
+  },
+  {
+   "say": "So it's August, I drag a duffel bag up four flights to this tiny cinderblock box, and Danny's already unpacked, with a label maker. He'd labeled his half of the closet. The mini fridge shelves. Mine just said Marcus, question mark.",
+   "truth": 2,
+   "kind": "on"
+  },
+  {
+   "say": "And hold on to that label maker, by the way, because it comes back later, once a certain lady in a white dress shows up in this story. It matters, I promise.",
+   "truth": 2,
+   "kind": "preview"
+  },
+  {
+   "say": "And I'm a kid from a farm town who owns one towel, lying there the first night thinking, no way, I'm putting in for a transfer before Thanksgiving. I actually printed the form.",
+   "truth": 2,
+   "kind": "on"
+  },
+  {
+   "say": "Okay, so, the one everybody's waiting for. Spring break, sophomore year, Danny decides we're gonna rough it in the woods for three nights. Tents, a fire, no phones.",
+   "truth": 4,
+   "kind": "skip"
+  },
+  {
+   "say": "Neither of us had ever slept outside. Night one, Danny hangs the food in a tree like the ranger said, super proud, and at two in the morning I wake up to the tent zipper. Slowly. Going up.",
+   "truth": 4,
+   "kind": "on"
+  },
+  {
+   "say": "Side note, I have a rule now, below two bars of signal I turn the car around. My sister says it's a condition. It's not, it's wisdom.",
+   "truth": 4,
+   "kind": "tangent"
+  },
+  {
+   "say": "And there's this fat little masked bandit on Danny's sleeping bag eating the marshmallows he'd hidden in his hoodie. He chases it out in his boxers, it starts pouring, the tent folds on me, and we spend the night in his Honda eating gas station jerky.",
+   "truth": 4,
+   "kind": "on"
+  },
+  {
+   "say": "Oh, wait, sorry, I skipped a card. Before the woods, I was supposed to tell you how I went from wanting that transfer to basically having a brother.",
+   "truth": 3,
+   "kind": "goback"
+  },
+  {
+   "say": "Because by October, the label maker guy and the one towel guy were a package deal. See one of us in the dining hall, the other's two steps behind carrying both trays. People called us Danrcus. Which is terrible. It never caught on.",
+   "truth": 3,
+   "kind": "on"
+  },
+  {
+   "say": "And that transfer form I told you about? Never turned it in. It's still in a shoebox at my mom's house.",
+   "truth": 3,
+   "kind": "callback"
+  },
+  {
+   "say": "Okay, where was I, right, fast forward a few years, we're living in the city, and Danny starts texting me about a girl from his Tuesday night pottery class. Priya.",
+   "truth": 5,
+   "kind": "resume"
+  },
+  {
+   "say": "Then I finally got to hang out with her, at this awful bar trivia night, and she carried our whole team through the geography round, then handed me a lopsided bowl she'd made, just as a gift. I texted Danny from the bathroom, do not mess this up.",
+   "truth": 5,
+   "kind": "on"
+  },
+  {
+   "say": "Sorry, hang on, these cards got shuffled somewhere between the tacos and here, um, where, okay, yeah. Yep. Got it.",
+   "truth": 5,
+   "kind": "filler"
+  },
+  {
+   "say": "Then I got to watch my best friend turn into a whole different person. Mister label maker, who had a spreadsheet for his laundry, booked a flight to Lisbon on a random Tuesday because she'd never seen the ocean from the other side.",
+   "truth": 6,
+   "kind": "on"
+  },
+  {
+   "say": "Remember the fridge shelves with his name on them? That man now shares a closet. No labels. I checked. I went through it.",
+   "truth": 6,
+   "kind": "callback"
+  },
+  {
+   "say": "He's softer, too. Calls his mom every Sunday. Took salsa lessons. He says stuff like, I don't know, let's find out, which nobody had ever heard come out of Danny's mouth before.",
+   "truth": 6,
+   "kind": "on"
+  },
+  {
+   "say": "And the reason the two of them fit, I think, is balance. Priya's fearless, Danny's careful. She jumps out of the plane, he checked the parachute twice. She makes him brave, and he makes it safe to be brave.",
+   "truth": 7,
+   "kind": "on"
+  },
+  {
+   "say": "Full disclosure, I've never jumped out of a plane. I did a zipline once in Cancun and screamed so loud the guide gave me a discount.",
+   "truth": 7,
+   "kind": "tangent"
+  },
+  {
+   "say": "And actually, that whole balance thing ties into something my grandpa told me, which I'll get to in a minute, don't let me forget.",
+   "truth": 7,
+   "kind": "preview"
+  },
+  {
+   "say": "Seriously though, I've seen them in a crisis, the flooded apartment, her car dying on the highway, and they never panic at the same time. One's always the calm one. Like they take shifts.",
+   "truth": 7,
+   "kind": "on"
+  },
+  {
+   "say": "Alright. Um. So. Okay, moving on.",
+   "truth": 8,
+   "kind": "transition",
+   "accept": [
+    7
+   ]
+  },
+  {
+   "say": "Now, I'm not married, I can barely manage a houseplant, so I called my grandparents, sixty years together, and asked what they'd want you two to hear. I've got two things.",
+   "truth": 8,
+   "kind": "on"
+  },
+  {
+   "say": "First, from Grandma. When things go sideways, and they will, the burnt turkey, the missed connection in Denver, find the joke in it. Don't take it all so seriously. And you two already know how, I once watched you crack up for ten minutes in a hardware store over a plunger.",
+   "truth": 9,
+   "kind": "on"
+  },
+  {
+   "say": "Plus Danny's had plenty of practice being the punchline, ever since that masked bandit ate his marshmallows.",
+   "truth": 9,
+   "kind": "callback"
+  },
+  {
+   "say": "And second, from Grandpa, who barely talks, so you listen. He said love isn't something you fall into once and you're done. It's a decision. You make it again on some random Wednesday when you're exhausted and the dishes are piled up. You pick her again. You pick him again.",
+   "truth": 10,
+   "kind": "on"
+  },
+  {
+   "say": "Hold on, there's something else scribbled here and I can't read my own handwriting. Nope. Probably a taco joke.",
+   "truth": 10,
+   "kind": "filler"
+  },
+  {
+   "say": "On the good days, sure, but mostly on the boring ones, for the rest of your lives. That's all he said, and then he went back to his soup.",
+   "truth": 10,
+   "kind": "on"
+  },
+  {
+   "say": "So, if everybody could grab whatever's in front of you, champagne, sparkling cider, Uncle Ray, yes, I see the beer, it counts, and lift it up with me.",
+   "truth": 11,
+   "kind": "on"
+  },
+  {
+   "say": "To Priya, who taught my best friend to be brave, and to Danny, who will label everything in your house but never needed a label to know he loves you. To you two. Cheers.",
+   "truth": 11,
+   "kind": "on"
+  }
+ ]
+}

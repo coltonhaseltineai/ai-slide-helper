@@ -1,0 +1,60 @@
+name: Publish tiny meaning model
+
+# Run by hand (Actions → "Publish tiny meaning model" → Run workflow). Publishes the potion-base-8M
+# static embedding model to a "models-v1" GitHub release that the Mac app downloads once.
+# The release is a PRE-release and never "latest", so Sparkle's releases/latest update feed is unaffected.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch potion-base-8M (MIT, MinishLab) from its npm package
+        run: |
+          npm pack counterparts-model-potion@0.1.0
+          tar xzf counterparts-model-potion-0.1.0.tgz
+          cd package
+          echo "f65d0f325faadc1e121c319e2faa41170d3fa07d8c89abd48ca5358d9a223de2  model.safetensors" | sha256sum -c -
+          echo "1394523a67ddd404a825428018c0582a6998bcfa044ecbcbf1f4d71adb94c61c  vocab.txt" | sha256sum -c -
+      - name: Convert to raw float16 and write the manifest
+        run: |
+          python3 -m pip install --quiet numpy
+          mkdir -p out
+          python3 - <<'PY'
+          import json, struct, hashlib, numpy as np, shutil
+          with open('package/model.safetensors', 'rb') as f:
+              n = struct.unpack('<Q', f.read(8))[0]
+              h = json.loads(f.read(n))
+              a, b = h['embeddings']['data_offsets']
+              f.seek(8 + n + a)
+              rows, dim = h['embeddings']['shape']
+              t = np.frombuffer(f.read(b - a), dtype='<f4').reshape(rows, dim)
+          t.astype('<f2').tofile('out/potion-base-8M.f16')
+          shutil.copy('package/vocab.txt', 'out/potion-vocab.txt')
+          shutil.copy('package/LICENSE', 'out/LICENSE-potion.txt')
+          files = []
+          for name in ['potion-base-8M.f16', 'potion-vocab.txt', 'LICENSE-potion.txt']:
+              data = open('out/' + name, 'rb').read()
+              files.append({'name': name, 'sha256': hashlib.sha256(data).hexdigest(), 'bytes': len(data)})
+          manifest = {'id': 'potion-base-8M', 'dimension': int(dim), 'format': 'f16',
+                      'weights': 'potion-base-8M.f16', 'vocab': 'potion-vocab.txt', 'files': files,
+                      'source': 'minishlab/potion-base-8M via npm counterparts-model-potion@0.1.0', 'license': 'MIT'}
+          json.dump(manifest, open('out/manifest.json', 'w'), indent=1)
+          print(json.dumps(manifest, indent=1))
+          PY
+      - name: Publish the models-v1 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view models-v1 >/dev/null 2>&1; then
+            gh release upload models-v1 out/* --clobber
+          else
+            gh release create models-v1 out/* --prerelease --latest=false \
+              --title "Live Outline models (v1)" \
+              --notes "Tiny meaning model used by the Mac app for on-device following. potion-base-8M by MinishLab (MIT)."
+          fi

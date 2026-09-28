@@ -1,0 +1,939 @@
+{
+"vocab": "bert-uncased-vocab.txt",
+"cases": [
+{
+"text": "so rest is honestly the foundation of everything",
+"ids": [
+2061,
+2717,
+2003,
+9826,
+1996,
+3192,
+1997,
+2673
+],
+"tokens": [
+"so",
+"rest",
+"is",
+"honestly",
+"the",
+"foundation",
+"of",
+"everything"
+]
+},
+{
+"text": "put the phone down an hour before you hit the pillow that blue glow keeps you wired",
+"ids": [
+2404,
+1996,
+3042,
+2091,
+2019,
+3178,
+2077,
+2017,
+2718,
+1996,
+10005,
+2008,
+2630,
+8652,
+7906,
+2017,
+17502
+],
+"tokens": [
+"put",
+"the",
+"phone",
+"down",
+"an",
+"hour",
+"before",
+"you",
+"hit",
+"the",
+"pillow",
+"that",
+"blue",
+"glow",
+"keeps",
+"you",
+"wired"
+]
+},
+{
+"text": "Don't you think it's e-mail time?",
+"ids": [
+2123,
+1005,
+1056,
+2017,
+2228,
+2009,
+1005,
+1055,
+1041,
+1011,
+5653,
+2051,
+1029
+],
+"tokens": [
+"don",
+"'",
+"t",
+"you",
+"think",
+"it",
+"'",
+"s",
+"e",
+"-",
+"mail",
+"time",
+"?"
+]
+},
+{
+"text": "Café naïve résumé Ünïcödé",
+"ids": [
+7668,
+15743,
+13746,
+27260
+],
+"tokens": [
+"cafe",
+"naive",
+"resume",
+"unicode"
+]
+},
+{
+"text": "hello!!! (world) [x] {y} <z>",
+"ids": [
+7592,
+999,
+999,
+999,
+1006,
+2088,
+1007,
+1031,
+1060,
+1033,
+1063,
+1061,
+1065,
+1026,
+1062,
+1028
+],
+"tokens": [
+"hello",
+"!",
+"!",
+"!",
+"(",
+"world",
+")",
+"[",
+"x",
+"]",
+"{",
+"y",
+"}",
+"<",
+"z",
+">"
+]
+},
+{
+"text": "12:30 pm on 3/4/2025 costs $19.99 — or 20%",
+"ids": [
+2260,
+1024,
+2382,
+7610,
+2006,
+1017,
+1013,
+1018,
+1013,
+16798,
+2629,
+5366,
+1002,
+2539,
+1012,
+5585,
+1517,
+2030,
+2322,
+1003
+],
+"tokens": [
+"12",
+":",
+"30",
+"pm",
+"on",
+"3",
+"/",
+"4",
+"/",
+"202",
+"##5",
+"costs",
+"$",
+"19",
+".",
+"99",
+"—",
+"or",
+"20",
+"%"
+]
+},
+{
+"text": "supercalifragilisticexpialidocious",
+"ids": [
+3565,
+9289,
+10128,
+29181,
+24411,
+4588,
+10288,
+19312,
+21273,
+10085,
+6313
+],
+"tokens": [
+"super",
+"##cal",
+"##if",
+"##rag",
+"##ilis",
+"##tic",
+"##ex",
+"##pia",
+"##lid",
+"##oc",
+"##ious"
+]
+},
+{
+"text": "antidisestablishmentarianism",
+"ids": [
+3424,
+10521,
+4355,
+7875,
+13602,
+3672,
+12199,
+2964
+],
+"tokens": [
+"anti",
+"##dis",
+"##est",
+"##ab",
+"##lish",
+"##ment",
+"##arian",
+"##ism"
+]
+},
+{
+"text": "we'll grab coffee & donuts @ 9",
+"ids": [
+2057,
+1005,
+2222,
+6723,
+4157,
+1004,
+2123,
+16446,
+1030,
+1023
+],
+"tokens": [
+"we",
+"'",
+"ll",
+"grab",
+"coffee",
+"&",
+"don",
+"##uts",
+"@",
+"9"
+]
+},
+{
+"text": "“smart quotes” and ‘single’ ones",
+"ids": [
+1523,
+6047,
+16614,
+1524,
+1998,
+1520,
+2309,
+1521,
+3924
+],
+"tokens": [
+"“",
+"smart",
+"quotes",
+"”",
+"and",
+"‘",
+"single",
+"’",
+"ones"
+]
+},
+{
+"text": "tab\tand\nnewline\r\nhere",
+"ids": [
+21628,
+1998,
+2047,
+4179,
+2182
+],
+"tokens": [
+"tab",
+"and",
+"new",
+"##line",
+"here"
+]
+},
+{
+"text": "emoji 😀 test 🚀🚀",
+"ids": [
+7861,
+29147,
+2072,
+100,
+3231,
+100
+],
+"tokens": [
+"em",
+"##oj",
+"##i",
+"[UNK]",
+"test",
+"[UNK]"
+]
+},
+{
+"text": "中文字符 mixed with english",
+"ids": [
+1746,
+1861,
+100,
+100,
+3816,
+2007,
+2394
+],
+"tokens": [
+"中",
+"文",
+"[UNK]",
+"[UNK]",
+"mixed",
+"with",
+"english"
+]
+},
+{
+"text": "日本語のテキスト",
+"ids": [
+1864,
+1876,
+1950,
+1671,
+30239,
+30227,
+30233,
+30240
+],
+"tokens": [
+"日",
+"本",
+"語",
+"の",
+"##テ",
+"##キ",
+"##ス",
+"##ト"
+]
+},
+{
+"text": "한국어 텍스트",
+"ids": [
+1469,
+30006,
+30021,
+29991,
+30014,
+30020,
+29999,
+30008,
+1467,
+30009,
+30020,
+29997,
+30017,
+30003,
+30017
+],
+"tokens": [
+"ᄒ",
+"##ᅡ",
+"##ᆫ",
+"##ᄀ",
+"##ᅮ",
+"##ᆨ",
+"##ᄋ",
+"##ᅥ",
+"ᄐ",
+"##ᅦ",
+"##ᆨ",
+"##ᄉ",
+"##ᅳ",
+"##ᄐ",
+"##ᅳ"
+]
+},
+{
+"text": "ALL CAPS SHOUTING",
+"ids": [
+2035,
+9700,
+11273
+],
+"tokens": [
+"all",
+"caps",
+"shouting"
+]
+},
+{
+"text": "MiXeD cAsE wOrDs",
+"ids": [
+3816,
+2553,
+2616
+],
+"tokens": [
+"mixed",
+"case",
+"words"
+]
+},
+{
+"text": "hyphen-ated-words and under_scores",
+"ids": [
+1044,
+22571,
+10222,
+1011,
+8823,
+2094,
+1011,
+2616,
+1998,
+2104,
+1035,
+7644
+],
+"tokens": [
+"h",
+"##yp",
+"##hen",
+"-",
+"ate",
+"##d",
+"-",
+"words",
+"and",
+"under",
+"_",
+"scores"
+]
+},
+{
+"text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+"ids": [
+100
+],
+"tokens": [
+"[UNK]"
+]
+},
+{
+"text": "zero​width",
+"ids": [
+5717,
+9148,
+11927,
+2232
+],
+"tokens": [
+"zero",
+"##wi",
+"##dt",
+"##h"
+]
+},
+{
+"text": "non breaking space",
+"ids": [
+2512,
+4911,
+2686
+],
+"tokens": [
+"non",
+"breaking",
+"space"
+]
+},
+{
+"text": "control\u0007char",
+"ids": [
+2491,
+7507,
+2099
+],
+"tokens": [
+"control",
+"##cha",
+"##r"
+]
+},
+{
+"text": "ﬁ ligature",
+"ids": [
+1984,
+8018,
+11244
+],
+"tokens": [
+"ﬁ",
+"liga",
+"##ture"
+]
+},
+{
+"text": "Ångström",
+"ids": [
+17076,
+15687
+],
+"tokens": [
+"ang",
+"##strom"
+]
+},
+{
+"text": "São Paulo",
+"ids": [
+7509,
+9094
+],
+"tokens": [
+"sao",
+"paulo"
+]
+},
+{
+"text": "straße",
+"ids": [
+2358,
+27807
+],
+"tokens": [
+"st",
+"##raße"
+]
+},
+{
+"text": "ǅemal",
+"ids": [
+100
+],
+"tokens": [
+"[UNK]"
+]
+},
+{
+"text": "the cat's whiskers",
+"ids": [
+1996,
+4937,
+1005,
+1055,
+1059,
+24158,
+11451
+],
+"tokens": [
+"the",
+"cat",
+"'",
+"s",
+"w",
+"##his",
+"##kers"
+]
+},
+{
+"text": "rock'n'roll",
+"ids": [
+2600,
+1005,
+1050,
+1005,
+4897
+],
+"tokens": [
+"rock",
+"'",
+"n",
+"'",
+"roll"
+]
+},
+{
+"text": "i.e. e.g. etc.",
+"ids": [
+1045,
+1012,
+1041,
+1012,
+1041,
+1012,
+1043,
+1012,
+4385,
+1012
+],
+"tokens": [
+"i",
+".",
+"e",
+".",
+"e",
+".",
+"g",
+".",
+"etc",
+"."
+]
+},
+{
+"text": "...ellipsis…",
+"ids": [
+1012,
+1012,
+1012,
+3449,
+15000,
+6190,
+1529
+],
+"tokens": [
+".",
+".",
+".",
+"el",
+"##lip",
+"##sis",
+"…"
+]
+},
+{
+"text": "#hashtag @mention",
+"ids": [
+1001,
+23325,
+15900,
+1030,
+5254
+],
+"tokens": [
+"#",
+"hash",
+"##tag",
+"@",
+"mention"
+]
+},
+{
+"text": "sourdough starter needs feeding twice a day",
+"ids": [
+14768,
+26797,
+5603,
+11753,
+3791,
+8521,
+3807,
+1037,
+2154
+],
+"tokens": [
+"sour",
+"##dou",
+"##gh",
+"starter",
+"needs",
+"feeding",
+"twice",
+"a",
+"day"
+]
+},
+{
+"text": "the fermentation bulk rise",
+"ids": [
+1996,
+10768,
+10867,
+19304,
+9625,
+4125
+],
+"tokens": [
+"the",
+"fe",
+"##rm",
+"##entation",
+"bulk",
+"rise"
+]
+},
+{
+"text": "okay so where was i um",
+"ids": [
+3100,
+2061,
+2073,
+2001,
+1045,
+8529
+],
+"tokens": [
+"okay",
+"so",
+"where",
+"was",
+"i",
+"um"
+]
+},
+{
+"text": "neuroplasticity hippocampus consolidation",
+"ids": [
+11265,
+10976,
+24759,
+20875,
+3012,
+5099,
+6873,
+26468,
+2271,
+17439
+],
+"tokens": [
+"ne",
+"##uro",
+"##pl",
+"##astic",
+"##ity",
+"hip",
+"##po",
+"##camp",
+"##us",
+"consolidation"
+]
+},
+{
+"text": "covid-19 h1n1 1918",
+"ids": [
+2522,
+17258,
+1011,
+2539,
+1044,
+2487,
+2078,
+2487,
+4271
+],
+"tokens": [
+"co",
+"##vid",
+"-",
+"19",
+"h",
+"##1",
+"##n",
+"##1",
+"1918"
+]
+},
+{
+"text": "CPR AED EMT",
+"ids": [
+18133,
+2099,
+29347,
+2094,
+7861,
+2102
+],
+"tokens": [
+"cp",
+"##r",
+"ae",
+"##d",
+"em",
+"##t"
+]
+},
+{
+"text": "x",
+"ids": [
+1060
+],
+"tokens": [
+"x"
+]
+},
+{
+"text": "",
+"ids": [],
+"tokens": []
+},
+{
+"text": "   leading and trailing   ",
+"ids": [
+2877,
+1998,
+12542
+],
+"tokens": [
+"leading",
+"and",
+"trailing"
+]
+},
+{
+"text": "q&a",
+"ids": [
+1053,
+1004,
+1037
+],
+"tokens": [
+"q",
+"&",
+"a"
+]
+},
+{
+"text": "don’t",
+"ids": [
+2123,
+1521,
+1056
+],
+"tokens": [
+"don",
+"’",
+"t"
+]
+},
+{
+"text": "résumé-writing",
+"ids": [
+13746,
+1011,
+3015
+],
+"tokens": [
+"resume",
+"-",
+"writing"
+]
+},
+{
+"text": "email@example.com",
+"ids": [
+10373,
+1030,
+2742,
+1012,
+4012
+],
+"tokens": [
+"email",
+"@",
+"example",
+".",
+"com"
+]
+},
+{
+"text": "http://x.y/z?a=b",
+"ids": [
+8299,
+1024,
+1013,
+1013,
+1060,
+1012,
+1061,
+1013,
+1062,
+1029,
+1037,
+1027,
+1038
+],
+"tokens": [
+"http",
+":",
+"/",
+"/",
+"x",
+".",
+"y",
+"/",
+"z",
+"?",
+"a",
+"=",
+"b"
+]
+}
+]
+}

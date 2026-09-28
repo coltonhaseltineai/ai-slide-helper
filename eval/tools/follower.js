@@ -59,6 +59,7 @@ class Follower {
     const d = v.point - this.current;
     if (d === 1) {
       if (v.confidence === 'high') return this._move(v.point);
+      if (p.mediumNow) return this._move(v.point);
       const recent = agreeing.some(x => at - x.at <= p.mediumAgreeWithin);
       return recent || localSupport ? this._move(v.point) : { moved: false, reason: 'needs-agreement' };
     }

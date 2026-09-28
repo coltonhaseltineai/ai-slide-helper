@@ -5,13 +5,16 @@ A speaker pastes their talk outline, clicks **Present**, and then **Start listen
 ## iPhone
 Open **https://live-outline.vercel.app** in Safari, then tap Share → **Add to Home Screen**. Tap **Listen** to follow your voice, and swipe or use ‹ › to move by hand. If listening isn't allowed from the home-screen icon, open the same link in Safari.
 
-## Smart following (Claude)
-Speakers rarely read their outline word for word. Smart following is in the **Mac app** for now (⌘, → Settings); the iPhone version doesn't use it yet. With it on:
-- When you start presenting, Claude writes related hint words for each line (`api/expand`).
-- While you talk, the app matches on the device first. When it's unsure for a few seconds, or every ~10 seconds, it sends the last ~25 seconds of speech to Claude (`api/locate`), which says which point you're on and which of your words showed it.
-- Those words are saved per outline line, and fixing the highlight by hand teaches it too. Next time the app recognises them on its own, so it gets quicker and needs Claude less.
+## Following by meaning (Mac app)
+Speakers rarely read their outline word for word, so the Mac app follows **what you mean**, not just which words you say. Choose how in Settings (⌘,) → **Follow by meaning**:
+- **Automatic** (default): Apple's on-device model when your Mac has Apple Intelligence (macOS 26+, Apple silicon), otherwise a tiny meaning model. Both are free, private and work offline.
+- **Apple on-device model**, **Tiny meaning model**, **Claude** (needs the access code) or **Keywords only**.
 
-Server setup (Vercel project settings → Environment Variables): `ANTHROPIC_API_KEY` (your key) and `ACCESS_CODE` (the code you type into the app).
+A few times a second, the judge sees the outline, the point shown now and the last ~20 seconds of speech. It answers *same*, *moved to point N*, *tangent* or *unclear*, each with a confidence. The highlight moves at once for a confident move to the next point. It needs a second vote to skip ahead or go back, and it holds still for asides and callbacks. Your arrow keys always win. **Nothing is learned or saved from your speech.**
+
+**Help → Compare Judges** replays 10 practice talks through each judge on your Mac and shows who stays on the right point and how fast. Claude's rows are recorded results from `eval/`. `eval/README.md` explains how the benchmark works.
+
+Server setup for the Claude option (Vercel project settings → Environment Variables): `ANTHROPIC_API_KEY` and `ACCESS_CODE` (the code you type into the app). `api/follow` is the judge; the older `api/locate` and `api/expand` still answer old app versions but no longer learn anything.
 
 ## Mac app (recommended)
 A native SwiftUI app lives in `mac/`. It uses Apple's built-in speech recognition, which runs on your Mac when your Mac supports it.
@@ -22,7 +25,7 @@ A native SwiftUI app lives in `mac/`. It uses Apple's built-in speech recognitio
 - `SPARKLE_PRIVATE_KEY`, which signs updates so the app only installs genuine ones.
 - `MAC_SIGNING_P12`, a signing certificate (base64 .p12, password `liveoutline`) so every version has the same identity and keeps its microphone permission.
 
-**Build it yourself** (macOS 14+ with the Xcode command line tools):
+**Build it yourself** (Xcode 26.4 or later, for Apple's on-device model; the app itself runs on macOS 14+):
 ```
 cd mac
 ./scripts/build-app.sh      # creates mac/build/Live Outline.app
@@ -50,6 +53,6 @@ Recent speech is turned into keywords, and each outline line is scored by how ma
 
 ## Tests
 ```
-node --test            # web matcher
-cd mac && swift test   # Swift matcher
+node --test            # web matcher, judge server, benchmark data and fixtures
+cd mac && swift test   # Swift matcher, judge prompt/follower parity with the JavaScript reference, closed-loop replay
 ```
