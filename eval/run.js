@@ -374,4 +374,4 @@ function printTable(rows) {
 }
 
 if (require.main === module) main().catch(e => { console.error(e); process.exit(1); });
-module.exports = { loadTalks, scoreTimeline, runKeywords, runJudge, tinyRunner, summarize, claudeJudge, prepFor };
+module.exports = { loadVerdictCache, loadTalks, scoreTimeline, runKeywords, runJudge, tinyRunner, summarize, claudeJudge, prepFor };
