@@ -27,21 +27,36 @@ function cleanItems(items) {
   return items.map(t => String(t || '').slice(0, 200));
 }
 
-// Asks Claude for JSON matching `schema` and returns the parsed object.
-async function askJSON({ model, system, prompt, schema, maxTokens, effort }) {
+// Asks Claude for JSON matching `schema`. Returns the parsed object plus timing and usage.
+// `extra` adds request fields (e.g. temperature, thinking); `requestOptions` sets SDK options (timeout, maxRetries).
+async function askJSONMeta({ model, system, prompt, schema, maxTokens, effort, extra, requestOptions }) {
   const outputConfig = { format: { type: 'json_schema', schema } };
   if (effort) outputConfig.effort = effort;
+  const started = Date.now();
   const response = await getClient().messages.create({
     model,
     max_tokens: maxTokens,
     system,
     messages: [{ role: 'user', content: prompt }],
     output_config: outputConfig,
-  });
+    ...(extra || {}),
+  }, requestOptions);
+  const ms = Date.now() - started;
   if (response.stop_reason === 'refusal') throw new Error('Claude declined this request.');
   if (response.stop_reason === 'max_tokens') throw new Error('Claude ran out of room to answer.');
   const text = response.content.filter(b => b.type === 'text').map(b => b.text).join('');
-  return JSON.parse(text);
+  const usage = response.usage || {};
+  return {
+    data: JSON.parse(text),
+    model: response.model,
+    usage: { input: usage.input_tokens || 0, output: usage.output_tokens || 0 },
+    ms,
+    stopReason: response.stop_reason,
+  };
+}
+
+async function askJSON(args) {
+  return (await module.exports.askJSONMeta(args)).data;
 }
 
 function send(res, status, data) {
@@ -59,4 +74,4 @@ function sendError(res, err) {
   return send(res, 502, { error: (err && err.message) || 'Claude request failed.' });
 }
 
-module.exports = { askJSON, readBody, checkRequest, cleanItems, send, sendError };
+module.exports = { askJSON, askJSONMeta, readBody, checkRequest, cleanItems, send, sendError };

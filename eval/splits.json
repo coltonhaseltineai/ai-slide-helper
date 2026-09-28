@@ -1,0 +1,4 @@
+{
+  "dev": ["sleep", "quarterly", "sourdough", "heat", "firstaid", "stoicism"],
+  "test": ["money", "postmortem", "toast", "flu1918"]
+}

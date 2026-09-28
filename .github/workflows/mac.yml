@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-26
     defaults:
       run:
         working-directory: mac
@@ -19,6 +19,17 @@ jobs:
       HAS_UPDATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY != '' }}
     steps:
       - uses: actions/checkout@v4
+
+      # Apple's on-device model (FoundationModels) needs the macOS 26.4+ SDK, i.e. Xcode 26.4 or later.
+      - name: Select Xcode 26.4+
+        run: |
+          XC=$(ls -d /Applications/Xcode_26.*.app 2>/dev/null | sort -V | tail -1)
+          [ -n "$XC" ] || { echo "::error::no Xcode 26 on this runner"; exit 1; }
+          sudo xcode-select -s "$XC/Contents/Developer"
+          xcodebuild -version && swift --version
+          SDK=$(xcrun --sdk macosx --show-sdk-version)
+          echo "macOS SDK $SDK"
+          [ "$(printf '%s\n' 26.4 "$SDK" | sort -V | head -1)" = 26.4 ] || { echo "::error::need the macOS 26.4+ SDK, got $SDK"; exit 1; }
 
       - name: Test matcher
         run: swift test
@@ -57,7 +68,8 @@ jobs:
 
       # Every push publishes a release; installed apps find it through appcast.xml.
       - name: Publish update
-        if: github.event_name != 'pull_request' && env.HAS_SIGNING == 'true' && env.HAS_UPDATE_KEY == 'true'
+        # Put [no release] in a commit message to build and test without publishing an update.
+        if: github.event_name != 'pull_request' && !contains(github.event.head_commit.message, '[no release]') && env.HAS_SIGNING == 'true' && env.HAS_UPDATE_KEY == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
@@ -75,4 +87,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: npm ci
       - run: node --test

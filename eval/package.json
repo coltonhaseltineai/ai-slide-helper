@@ -1,0 +1,8 @@
+{
+  "name": "live-outline-eval",
+  "private": true,
+  "description": "Developer-only benchmark tools (not deployed).",
+  "dependencies": {
+    "counterparts-model-potion": "0.1.0"
+  }
+}
