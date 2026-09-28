@@ -362,8 +362,13 @@ async function main() {
     console.log('wrote results/claude-reference.json');
   }
   fs.mkdirSync(path.join(EVAL, 'results'), { recursive: true });
+  if (missSeen.size) return printTable(rows);   // incomplete: don't save
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
   fs.writeFileSync(path.join(EVAL, 'results', `${split}-${stamp}.json`), JSON.stringify({ split, variant: variant || 'current', talks: talks.map(t => t.id), rows }, null, 1));
+  printTable(rows);
+}
+
+function printTable(rows) {
   console.log('\ncontender'.padEnd(26) + 'onCorrect  lagP50  lagP90  missed  wrong/10m  flicker/10m  calls/min  lat p50/p90');
   for (const r of rows) console.log(r.contender.padEnd(26) + String(r.onCorrect + '%').padEnd(11) + String(r.lagP50 + 's').padEnd(8) + String(r.lagP90 + 's').padEnd(8) + r.missedSwitches.padEnd(8) + String(r.wrongPer10).padEnd(11) + String(r.flickerPer10).padEnd(13) + String(r.callsPerMin).padEnd(11) + `${r.latP50}/${r.latP90}s`);
 }
