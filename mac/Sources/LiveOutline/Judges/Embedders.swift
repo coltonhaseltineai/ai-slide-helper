@@ -17,7 +17,9 @@ final class NLSentenceEmbedder: SentenceEmbedder, @unchecked Sendable {
         dimension = e.dimension
     }
 
-    func embed(_ texts: [String]) async throws -> [[Float]] {
+    func embed(_ texts: [String]) async throws -> [[Float]] { vectors(texts) }
+
+    private func vectors(_ texts: [String]) -> [[Float]] {
         lock.lock()
         defer { lock.unlock() }
         return texts.map { t in

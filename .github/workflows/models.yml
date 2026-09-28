@@ -1,10 +1,12 @@
 name: Publish tiny meaning model
 
-# Run by hand (Actions → "Publish tiny meaning model" → Run workflow). Publishes the potion-base-8M
+# Runs when this file changes, or by hand (Actions → "Publish tiny meaning model" → Run workflow). Publishes the potion-base-8M
 # static embedding model to a "models-v1" GitHub release that the Mac app downloads once.
 # The release is a PRE-release and never "latest", so Sparkle's releases/latest update feed is unaffected.
 on:
   workflow_dispatch:
+  push:
+    paths: ['.github/workflows/models.yml']   # publishes (or refreshes) the release when this file changes
 
 permissions:
   contents: write
