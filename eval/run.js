@@ -8,6 +8,9 @@
 // Claude contenders need ANTHROPIC_API_KEY (calls are cached in eval/.cache). Tiny models need EVAL_PYTHON
 // pointing at a Python with onnxruntime + tokenizers + numpy (see eval/python/embed.py).
 // Latencies here are from this machine straight to the Claude API, not from a Mac through Vercel.
+// EVAL_JUDGE=cache: never call the API. Unanswered questions go to .cache/misses.jsonl (and outline preps to
+// .cache/prep-misses.jsonl) for Claude subagents to answer via tools/misses.js; repeat until nothing is missing.
+// --reference (with --split all) writes results/claude-reference.json for the Mac app's Compare Judges window.
 'use strict';
 
 const fs = require('fs');

@@ -182,7 +182,7 @@ final class FMJudge: Judge {
 
     private func newSession(prewarmWith prefix: String?) -> LanguageModelSession {
         let s = LanguageModelSession(model: SystemLanguageModel.default, instructions: rules)
-        if let prefix { s.prewarm(promptPrefix: Prompt(prefix)) }
+        if let prefix { s.prewarm(promptPrefix: Prompt { prefix }) }
         return s
     }
 
